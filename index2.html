@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Neon Artz Studio - Creative website design, digital marketing, graphic design, mobile app development, hosting and branding services worldwide." />
+  <title>Neon Artz Studio | Creative Design & Digital Agency</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#050816;--bg2:#081225;--text:#f8fbff;--muted:#a8b3cf;--glass:rgba(255,255,255,.08);
+      --line:rgba(255,255,255,.14);--pink:#ff2bd6;--cyan:#15f5ff;--blue:#3264ff;--gold:#ffc857;--green:#29ff9a;
+      --card:rgba(255,255,255,.075);--shadow:0 30px 90px rgba(0,0,0,.45);--radius:26px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+    body:before{content:"";position:fixed;inset:0;z-index:-3;background:
+      radial-gradient(circle at 15% 12%,rgba(255,43,214,.35),transparent 28%),
+      radial-gradient(circle at 85% 18%,rgba(21,245,255,.28),transparent 30%),
+      radial-gradient(circle at 45% 86%,rgba(255,200,87,.18),transparent 30%),
+      linear-gradient(135deg,#050816,#071126 45%,#10071c)}
+    body:after{content:"";position:fixed;inset:0;z-index:-2;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
+    a{text-decoration:none;color:inherit}.container{width:min(1180px,92%);margin:auto}.section{padding:95px 0}.center{text-align:center}
+    .title{font-family:Poppins,sans-serif;font-size:clamp(2.1rem,5vw,4rem);line-height:1.08;letter-spacing:-.05em;margin:12px 0 18px}
+    .desc{color:var(--muted);max-width:760px;margin:0 auto 42px}.eyebrow{color:var(--cyan);font-weight:900;text-transform:uppercase;letter-spacing:.18em;font-size:.78rem}
+   .gradient{
+    background:linear-gradient(
+        90deg,
+        #00A8FF,
+        #0077FF,
+        #005BFF,
+        #00C6FF
+    );
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+}
+    #progress{position:fixed;top:0;left:0;height:4px;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink),var(--gold));z-index:9999}
+    .header{position:fixed;top:0;left:0;width:100%;z-index:999;padding:16px 0;transition:.3s}
+    .header.scrolled{background:rgba(5,8,22,.72);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:22px}.logo{display:flex;align-items:center;gap:10px}.logo img{width:135px;height:auto;display:block;object-fit:contain}.brand-text{font-family:Poppins,sans-serif;font-weight:900}
+    .menu{display:flex;align-items:center;gap:22px}.menu a{font-weight:800;color:var(--muted);font-size:.92rem}.menu a:hover{color:white}
+    .nav-actions{display:flex;gap:12px;align-items:center}.hamb,.theme{width:44px;height:44px;border:1px solid var(--line);border-radius:14px;background:var(--glass);color:white;cursor:pointer}.hamb{display:none}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 24px;border:1px solid var(--line);border-radius:999px;font-weight:900;transition:.3s;cursor:pointer}
+    .btn:hover{transform:translateY(-4px)}.btn-primary{border:0;color:white;background:linear-gradient(135deg,var(--blue),var(--pink));box-shadow:0 18px 45px rgba(255,43,214,.25)}.btn-soft{background:var(--glass);color:white}
+    .hero{min-height:100vh;display:grid;align-items:center;padding:135px 0 70px;position:relative;overflow:hidden}
+    .orb{position:absolute;border-radius:50%;filter:blur(18px);opacity:.7;animation:move 8s ease-in-out infinite alternate}.logo-bg{
+    position:absolute;
+    top:15%;
+    right:50%;
+    width: 200px;
+    height:200px;
+
+    background:url("logo2.png") no-repeat center;
+    background-size:contain;
+
+    opacity:0.08;              /* இன்னும் dim வேண்டும்னா 0.04 */
+    filter:blur(2px);
+
+    animation:logoFloat 8s ease-in-out infinite alternate;
+
+    pointer-events:none;
+    z-index:0;
+}
+
+@keyframes logoFloat{
+    0%{
+        transform:translateY(0px) rotate(0deg) scale(1);
+    }
+
+    50%{
+        transform:translateY(-20px) rotate(3deg) scale(1.03);
+    }
+
+    100%{
+        transform:translateY(15px) rotate(-3deg) scale(1);
+    }
+}.orb2{width:90px;height:90px;background:var(--cyan);bottom:20%;left:7%}.orb3{width:70px;height:70px;background:var(--gold);top:68%;right:38%}@keyframes move{to{transform:translate(30px,-40px) scale(1.15)}}
+    .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:55px;align-items:center;position:relative;z-index:2}.badge{display:inline-flex;align-items:center;gap:10px;background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:9px 15px;color:var(--muted);font-weight:700;margin-bottom:20px}.badge span{width:5px;height:5px;background:var(--green);border-radius:50%;box-shadow:0 0 18px var(--green)}
+    .hero h1{
+    font-family:Poppins,sans-serif;
+    font-size:clamp(2.2rem,5vw,4.8rem);
+    line-height:1;
+    letter-spacing:-.05em;
+    margin-bottom:24px;
+}
+    .hero p{font-size:1.12rem;color:var(--muted);max-width:660px}.cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+    .creative-card{position:relative;background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:1px solid var(--line);border-radius:34px;padding:24px;box-shadow:var(--shadow);overflow:hidden}
+    .creative-card:before{content:"";position:absolute;inset:-2px;background:conic-gradient(from 180deg,var(--cyan),var(--pink),var(--gold),var(--cyan));z-index:-1;filter:blur(22px);opacity:.45}.screen{min-height:390px;border-radius:24px;background:rgba(0,0,0,.28);border:1px solid var(--line);padding:22px;display:grid;gap:16px}.mini-top{display:flex;gap:9px}.dot{width:12px;height:12px;border-radius:50%;background:#ff4d6d}.dot:nth-child(2){background:#ffc857}.dot:nth-child(3){background:#29ff9a}.showcase{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;height:100%}.tile{border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,rgba(21,245,255,.18),rgba(255,43,214,.12));padding:18px;display:flex;flex-direction:column;justify-content:end}.tile.big{grid-row:span 2}.tile b{font-family:Poppins;font-size:1.35rem}.tile p{color:var(--muted);font-size:.9rem}
+    .marquee{border-block:1px solid var(--line);background:rgba(255,255,255,.035);padding:22px 0;overflow:hidden}.track{display:flex;gap:46px;white-space:nowrap;animation:marq 22s linear infinite;font-weight:900;color:var(--muted)}.track span{color:white}.track i{color:var(--cyan);font-style:normal}@keyframes marq{to{transform:translateX(-50%)}}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:0 20px 55px rgba(0,0,0,.2);backdrop-filter:blur(16px);transition:.3s}.card:hover{transform:translateY(-8px);border-color:rgba(21,245,255,.5)}
+    .service .icon{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;font-size:1.6rem;background:linear-gradient(135deg,rgba(21,245,255,.22),rgba(255,43,214,.18));margin-bottom:16px}.service h3,.portfolio h3,.price h3{font-family:Poppins;margin-bottom:10px}.service p,.portfolio p,.price p,.faq p{color:var(--muted)}
+    .about-box{min-height:380px;background:linear-gradient(135deg,rgba(50,100,255,.25),rgba(255,43,214,.15)),var(--card);display:flex;flex-direction:column;justify-content:end}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}.stat b{font-size:2rem;font-family:Poppins;color:var(--cyan)}.stat p{color:var(--muted);font-weight:800;font-size:.85rem}
+    .benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.benefit{padding:18px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(135deg,rgba(255,255,255,.09),rgba(255,255,255,.03));font-weight:900}.benefit:nth-child(2n){color:var(--cyan)}.benefit:nth-child(3n){color:var(--gold)}
+    .process{display:grid;grid-template-columns:repeat(7,1fr);gap:14px;margin-top:34px}.step{text-align:center}.num{width:42px;height:42px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--pink));font-weight:900}
+    .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:13px}.chip{padding:12px 18px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.07);font-weight:900;color:var(--muted)}
+    .portfolio{min-height:245px;display:flex;flex-direction:column;justify-content:end;background:linear-gradient(135deg,rgba(21,245,255,.14),rgba(255,43,214,.12),rgba(255,200,87,.12)),var(--card)}
+    .price.featured{border-color:var(--pink);transform:scale(1.03)}.amount{font-family:Poppins;font-size:2.4rem;color:var(--gold);margin:12px 0}.price ul{list-style:none;margin:18px 0}.price li{padding:7px 0;color:var(--muted)}.price li:before{content:"✓ ";color:var(--green);font-weight:900}
+    .faq-list{max-width:850px;margin:auto}.faq{margin-bottom:14px;overflow:hidden}.faq button{width:100%;border:0;background:transparent;color:white;display:flex;justify-content:space-between;text-align:left;font-weight:900;font-size:1rem;cursor:pointer}.faq p{display:none;margin-top:12px}.faq.open p{display:block}
+    .contact-wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:32px}.form{display:grid;gap:15px}.row{display:grid;grid-template-columns:1fr 1fr;gap:15px}.field{width:100%;padding:15px 16px;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid var(--line);color:white}.field::placeholder{color:#8190ad}textarea.field{min-height:130px}
+    .footer{background:#030611;border-top:1px solid var(--line);padding:55px 0 24px}.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:28px}.foot-grid a,.foot-grid p{display:block;color:var(--muted);margin:8px 0}.copy{text-align:center;border-top:1px solid var(--line);margin-top:30px;padding-top:20px;color:var(--muted)}
+    .whatsapp{position:fixed;right:22px;bottom:22px;width:58px;height:58px;border-radius:50%;background:#25d366;color:white;display:grid;place-items:center;font-size:1.5rem;z-index:1000;box-shadow:var(--shadow)}
+    .reveal{opacity:0;transform:translateY(24px);transition:.75s}.reveal.show{opacity:1;transform:none}
+
+    /* ================= ADDED: Image placeholders, glassmorphism, hover & shadow enhancements ================= */
+    /* Soft full-card background photo pattern (hero card, about box, first portfolio card) */
+    .bg-media{position:absolute;inset:0;border-radius:inherit;overflow:hidden;z-index:0;pointer-events:none}
+    .bg-media img{width:100%;height:100%;object-fit:cover;display:block;opacity:.3;transition:transform .6s ease,opacity .4s ease}
+
+    .creative-card{position:relative}
+    .creative-card>.screen{position:relative;z-index:1}
+    .creative-card:hover .bg-media img{transform:scale(1.07);opacity:.4}
+
+    .about-box{position:relative}
+    .about-box>*:not(.bg-media){position:relative;z-index:1}
+    .about-box:hover .bg-media img{transform:scale(1.07);opacity:.42}
+
+    .portfolio{position:relative}
+    .portfolio>*:not(.bg-media){position:relative;z-index:1}
+    .portfolio:hover .bg-media img{transform:scale(1.08);opacity:.45}
+
+    /* Standalone framed photo (service thumbnails) - fully responsive, glass + shadow + hover */
+    .img-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;margin-bottom:16px;border:1px solid var(--line);background:rgba(255,255,255,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 20px 45px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.25);transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease}
+    .img-frame img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease,filter .5s ease}
+    .img-frame:hover{transform:translateY(-6px);box-shadow:0 30px 65px rgba(21,245,255,.22),0 10px 26px rgba(255,43,214,.18);border-color:rgba(21,245,255,.5)}
+    .img-frame:hover img{transform:scale(1.09);filter:brightness(1.06) saturate(1.12)}
+    @media(max-width:620px){.img-frame{aspect-ratio:4/3}}
+    /* ================= END ADDED ================= */
+
+
+
+    /* ================= ADDED: Premium mouse moving style + creative image UI ================= */
+    .cursor-dot,.cursor-ring{position:fixed;left:0;top:0;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);display:none}
+    .cursor-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 18px var(--cyan),0 0 36px var(--pink)}
+    .cursor-ring{width:38px;height:38px;border-radius:50%;border:1px solid rgba(21,245,255,.75);box-shadow:0 0 28px rgba(255,43,214,.35);transition:width .2s ease,height .2s ease,border-color .2s ease,background .2s ease}
+    body.cursor-active .cursor-dot,body.cursor-active .cursor-ring{display:block}
+    body.cursor-hover .cursor-ring{width:62px;height:62px;background:rgba(255,43,214,.08);border-color:rgba(255, 85, 43, 0.9)}
+    .mouse-glow{position:fixed;left:0;top:0;width:420px;height:420px;border-radius:50%;pointer-events:none;z-index:-1;background:radial-gradient(circle,rgba(21,245,255,.13),rgba(255,43,214,.08),transparent 65%);filter:blur(8px);transform:translate(-50%,-50%);opacity:.9}
+    .tilt-card{transform-style:preserve-3d;will-change:transform}
+    .tilt-card:hover{box-shadow:0 35px 90px rgba(21,245,255,.18),0 20px 55px rgba(255,43,214,.16)}
+    .hero-visual-img{width:100%;height:190px;object-fit:cover;border-radius:18px;border:1px solid var(--line);margin-top:14px;opacity:.88;filter:saturate(1.15) contrast(1.05);transition:.45s ease}
+    .creative-card:hover .hero-visual-img{transform:scale(1.03);opacity:1}
+    .portfolio .portfolio-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.28;transition:.5s ease;z-index:0}
+    .portfolio:after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(5,8,22,.92),rgba(5,8,22,.35),rgba(5,8,22,.18));z-index:0}
+    .portfolio:hover .portfolio-img{transform:scale(1.09);opacity:.48}
+    .portfolio>*:not(.portfolio-img){position:relative;z-index:2}
+    .service:nth-child(2) .img-frame,.service:nth-child(4) .img-frame,.service:nth-child(5) .img-frame,.service:nth-child(8) .img-frame,.service:nth-child(9) .img-frame{display:block}
+    @media(max-width:940px){.cursor-dot,.cursor-ring,.mouse-glow{display:none!important}}
+    /* ================= END ADDED ================= */
+
+    @media(max-width:940px){.hamb{display:block}.menu{position:fixed;top:78px;right:-100%;height:calc(100vh - 78px);width:min(330px,85%);background:#090f22;border-left:1px solid var(--line);flex-direction:column;align-items:flex-start;padding:28px;transition:.3s}.menu.open{right:0}.hero-grid,.grid2,.contact-wrap{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}.benefits{grid-template-columns:1fr 1fr}.process{grid-template-columns:1fr 1fr}.foot-grid{grid-template-columns:1fr 1fr}.logo img{width:115px}}
+    @media(max-width:620px){.nav-actions .btn{display:none}.grid3,.benefits,.stats,.row,.foot-grid{grid-template-columns:1fr}.hero h1{font-size:2.85rem}.section{padding:72px 0}.process{grid-template-columns:1fr}.showcase{grid-template-columns:1fr}.logo img{width:105px}}
+   .logo img{
+    width: 200px;
+    height: auto;
+    display: block;
+  }
+  </style>
+</head>
+<body>
+  <div class="mouse-glow" id="mouseGlow"></div>
+  <div id="progress"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <header class="header" id="header">
+    <div class="container nav">
+      <a href="#home" class="logo">
+        <img src="logo2.png" alt="Neon Artz Studio Logo">
+      </a>
+      <nav class="menu" id="menu">
+        <a href="#home">Home</a><a href="#about">About</a><a href="#services">Services</a><a href="#portfolio">Portfolio</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme" id="theme" aria-label="theme">✨</button>
+        <a href="#contact" class="btn btn-primary">Get Quote</a>
+        <button class="hamb" id="hamb">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+    <div class="logo-bg"></div><span class="orb orb3"></span>
+      <div class="container hero-grid">
+        <div class="reveal">
+
+
+
+
+          <div class="badge"><span></span></div>
+
+          <h1>Glow Your Brand with <span class="gradient">Creativity</span></h1>
+
+          <p>Neon Artz Studio builds colorful brand identities, powerful websites, digital marketing campaigns, mobile apps, hosting solutions and creative designs for clients all over the world.</p>
+          <div class="cta"><a href="#contact" class="btn btn-primary">Start Your Project</a><a href="#portfolio" class="btn btn-soft">View Creative Works</a></div>
+        </div>
+        <div class="creative-card reveal">
+          <div class="bg-media"><img src="images/hero.jpg" alt="Neon Artz Studio creative showcase"></div>
+          <div class="screen">
+            <div class="mini-top"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            <img class="hero-visual-img" src="im4.png" alt="Creative website and branding workspace">
+            <div class="showcase">
+              <div class="tile big">
+                <img src="im14.jfif" class="tile-img" alt="Website Design">
+                <b>Creative Websites</b><p>Responsive, premium, colorful and conversion focused.</p></div>
+              <div class="tile"><img src="images/web-design.jpg" class="tile-img" alt="Website Design">
+                <b>Branding</b><p>Logo, poster, flyer and card designs.</p></div>
+              <div class="tile"><img src="images/web-design.jpg" class="tile-img" alt="Website Design">
+                <b>Marketing</b><p>Meta Ads, SEO and social growth.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="marquee"><div class="track"><span><i>✦</i> Website Design</span><span><i>✦</i> Digital Marketing</span><span><i>✦</i> Logo Design</span><span><i>✦</i> Web Hosting</span><span><i>✦</i> Mobile Apps</span><span><i>✦</i> Poster Design</span><span><i>✦</i> Website Design</span><span><i>✦</i> Digital Marketing</span><span><i>✦</i> Logo Design</span></div></div>
+
+    <section class="section" id="about"><div class="container grid2">
+      <div class="card about-box reveal">
+        <div class="bg-media"><img src="llo.png" alt="About Neon Artz Studio team and creative work"></div>
+        <span class="eyebrow">About Us</span><h2 class="title">Creative ideas. Smart technology. Real business growth.</h2><p class="desc" style="margin:0;text-align:left">We transform ideas into beautiful digital experiences with design, development and marketing.</p></div>
+      <div class="reveal"><span class="eyebrow">Neon Artz Studio</span><h5 class="title">A complete creative and digital agency</h5><p class="desc" style="margin-left:0;text-align:left">We provide professional website design, mobile app development, hosting, digital marketing, graphic design, branding, technical support and maintenance services worldwide.</p><div class="stats"><div class="stat"><b>50+</b><p>Creative Projects</p></div><div class="stat"><b>20+</b><p>Digital Services</p></div><div class="stat"><b>24/7</b><p>Support</p></div></div></div>
+    </div></section>
+
+    <section class="section" id="services"><div class="container">
+      <div class="center reveal"><span class="eyebrow">Our Services</span><h2 class="title">Everything your brand needs</h2><p class="desc">Creative, colorful and professional solutions for your complete online presence.</p></div>
+      <div class="grid3">
+        <div class="card service reveal">
+          <div class="img-frame"><img src="im9.jpg" alt="Website design and development showcase"></div>
+          <div class="icon">💻</div><h3>Website Design & Development</h3><p>Modern, responsive and SEO-friendly websites for every business.</p></div>
+        <div class="card service reveal"><div class="img-frame"><img src="im5.webp" alt="Web hosting server solution"></div><div class="icon">☁️</div><h3>Web Hosting Solutions</h3><p>Fast, secure hosting, domain setup and complete website management.</p></div>
+        <div class="card service reveal">
+          <div class="img-frame"><img src="im6.avif" alt="Mobile app UI design"></div>
+          <div class="icon">📱</div><h3>Mobile App Development</h3><p>Android and iOS app design with clean UI and smooth user experience.</p></div>
+        <div class="card service reveal"><div class="img-frame"><img src="im7.jpg" alt="Digital marketing campaign analytics"></div><div class="icon">📈</div><h3>Digital Marketing Services</h3><p>Meta ads, Google ads, SEO, social media marketing and lead generation.</p></div>
+        <div class="card service reveal"><div class="img-frame"><img src="im8.jpg" alt="Graphic design creative workspace"></div><div class="icon">🎨</div><h3>Graphic Design Services</h3><p>Social media creatives, brand designs, promotional designs and campaigns.</p></div>
+        <div class="card service reveal">
+          <div class="img-frame"><img src="llo.png" alt="Logo and brand identity design"></div>
+          <div class="icon">🏷️</div><h3>Logo Design</h3><p>Unique and memorable brand identity design for professional businesses.</p></div>
+        <div class="card service reveal">
+          <div class="img-frame"><img src="im11.jpg" alt="Poster and flyer design"></div>
+          <div class="icon">🖼️</div><h3>Poster & Flyer Design</h3><p>Attractive posters and flyers for offers, events and business promotions.</p></div>
+        <div class="card service reveal"><div class="img-frame"><img src="im12.jpg" alt="Premium business card design"></div><div class="icon">💳</div><h3>Visiting & Business Cards</h3><p>Premium card designs that create a strong first impression.</p></div>
+        <div class="card service reveal"><div class="img-frame"><img src="im13.png" alt="Technical support and maintenance"></div><div class="icon">🛠️</div><h3>Technical Support & Maintenance</h3><p>Website updates, backups, troubleshooting, hosting support and maintenance.</p></div>
+      </div>
+    </div></section>
+
+    <section class="section"><div class="container reveal">
+      <div class="center"><span class="eyebrow">Why Choose Us</span><h2 class="title">Premium output with creative energy</h2></div>
+      <div class="benefits"><div class="benefit">✓ Creative Designs</div><div class="benefit">✓ Colorful UI</div><div class="benefit">✓ Fast Delivery</div><div class="benefit">✓ Worldwide Service</div><div class="benefit">✓ Custom Solutions</div><div class="benefit">✓ Latest Technology</div><div class="benefit">✓ Affordable Pricing</div><div class="benefit">✓ Support & Maintenance</div></div>
+      <div class="process"><div class="step"><div class="num">1</div>Discover</div><div class="step"><div class="num">2</div>Plan</div><div class="step"><div class="num">3</div>Design</div><div class="step"><div class="num">4</div>Develop</div><div class="step"><div class="num">5</div>Test</div><div class="step"><div class="num">6</div>Launch</div><div class="step"><div class="num">7</div>Support</div></div>
+    </div></section>
+
+    <section class="section"><div class="container center reveal">
+      <span class="eyebrow">Technologies</span><h2 class="title">Tools we work with</h2>
+      <div class="chips"><span class="chip">HTML</span><span class="chip">CSS</span><span class="chip">JavaScript</span><span class="chip">React</span><span class="chip">WordPress</span><span class="chip">PHP</span><span class="chip">Laravel</span><span class="chip">Node.js</span><span class="chip">Flutter</span><span class="chip">Figma</span><span class="chip">Photoshop</span><span class="chip">Illustrator</span></div>
+    </div></section>
+
+    <section class="section" id="portfolio"><div class="container">
+      <div class="center reveal"><span class="eyebrow">Portfolio</span><h2 class="title">Creative project showcase</h2><p class="desc">Replace these cards with your real works, client posters, websites, logos and campaigns.</p></div>
+      <div class="grid3">
+        <div class="card portfolio reveal"><img class="portfolio-img" src="images/portfolio1.jpg" alt="Website design portfolio project"><h3>Website Design</h3><p>Premium business website UI</p></div>
+        <div class="card portfolio reveal"><img class="portfolio-img" src="images/portfolio2.jpg" alt="Logo identity project"><h3>Logo Identity</h3><p>Creative brand system</p></div>
+        <div class="card portfolio reveal"><img class="portfolio-img" src="images/portfolio3.jpg" alt="Meta ads campaign project"><h3>Meta Ads Campaign</h3><p>Lead generation creatives</p></div>
+        <div class="card portfolio reveal"><img class="portfolio-img" src="images/portfolio4.jpg" alt="Poster design project"><h3>Poster Design</h3><p>Colorful promo posters</p></div>
+        <div class="card portfolio reveal"><img class="portfolio-img" src="images/portfolio5.jpg" alt="Business card branding project"><h3>Business Cards</h3><p>Corporate print branding</p></div>
+        <div class="card portfolio reveal"><img class="portfolio-img" src="images/portfolio6.jpg" alt="Mobile app UI project"><h3>Mobile App UI</h3><p>Modern application design</p></div>
+      </div>
+    </div></section>
+
+    <section class="section" id="pricing"><div class="container">
+      <div class="center reveal"><span class="eyebrow">Pricing</span><h2 class="title">Starter packages</h2><p class="desc">Customize prices based on client requirements.</p></div>
+      <div class="grid3"><div class="card price reveal"><h3>Basic Website</h3><div class="amount">₹8k+</div><p>Small business website.</p><ul><li>3–5 Pages</li><li>Responsive Design</li><li>Contact Form</li><li>WhatsApp Button</li></ul><a href="#contact" class="btn btn-soft">Enquire</a></div><div class="card price featured reveal"><h3>Standard Website</h3><div class="amount">₹12k+</div><p>Professional service website.</p><ul><li>6–8 Pages</li><li>Gallery & Maps</li><li>Basic SEO</li><li>Social Links</li></ul><a href="#contact" class="btn btn-primary">Most Popular</a></div><div class="card price reveal"><h3>Premium Website</h3><div class="amount">₹18k+</div><p>Custom premium website.</p><ul><li>9–12 Pages</li><li>Custom UI</li><li>Animations</li><li>SEO Structure</li></ul><a href="#contact" class="btn btn-soft">Get Quote</a></div></div>
+    </div></section>
+
+    <section class="section"><div class="container center reveal"><span class="eyebrow">Industries</span><h2 class="title">Industries we serve</h2><div class="chips"><span class="chip">Education</span><span class="chip">Healthcare</span><span class="chip">Restaurant</span><span class="chip">Beauty & Salon</span><span class="chip">Real Estate</span><span class="chip">Retail</span><span class="chip">Startups</span><span class="chip">E-commerce</span><span class="chip">Corporate</span><span class="chip">Personal Brands</span></div></div></section>
+
+    <section class="section"><div class="container"><div class="center reveal"><span class="eyebrow">FAQ</span><h2 class="title">Frequently Asked Questions</h2></div><div class="faq-list">
+      <div class="card faq reveal"><button>Do you provide worldwide services? <span>+</span></button><p>Yes. Neon Artz Studio provides creative and digital services worldwide.</p></div>
+      <div class="card faq reveal"><button>Do you provide hosting and maintenance? <span>+</span></button><p>Yes. We provide hosting, domain setup, backups, updates and technical support.</p></div>
+      <div class="card faq reveal"><button>Can you manage social media ads? <span>+</span></button><p>Yes. We provide Meta Ads, social creatives, content design and lead generation campaigns.</p></div>
+    </div></div></section>
+
+    <section class="section" id="contact"><div class="container contact-wrap">
+      <div class="reveal"><span class="eyebrow">Contact Us</span><h2 class="title">Let's build something amazing together</h2><p class="desc" style="margin-left:0;text-align:left">Tell us your requirement and we will connect with you for a free consultation.</p><p>📧 neonartzstudioz@gmail.com</p><p>🌍 Services available worldwide</p><p>💬 WhatsApp support available</p></div>
+      <div class="card reveal"><form class="form" id="contactForm"><div class="row"><input class="field" required placeholder="Name"><input class="field" type="email" required placeholder="Email"></div><div class="row"><input class="field" required placeholder="Phone"><input class="field" placeholder="Company"></div><select class="field" required><option value="">Service Required</option><option>Website Design & Development</option><option>Digital Marketing</option><option>Graphic Design</option><option>Logo Design</option><option>Mobile App Development</option><option>Web Hosting</option><option>Technical Support</option></select><textarea class="field" required placeholder="Message"></textarea><button class="btn btn-primary" type="submit">Send Message</button></form></div>
+    </div></section>
+  </main>
+
+  <footer class="footer"><div class="container"><div class="foot-grid"><div><a href="#home" class="logo"><img src="logo2.png" alt="Neon Artz Studio"></a><p>Glow Your Brand with Creativity</p><p>Creative design, websites, marketing and technology solutions worldwide.</p></div><div><h4>Quick Links</h4><a href="#home">Home</a><a href="#about">About</a><a href="#services">Services</a><a href="#portfolio">Portfolio</a></div><div><h4>Services</h4><a>Website Design</a><a>Digital Marketing</a><a>Graphic Design</a><a>Mobile Apps</a></div><div><h4>Contact</h4><p>neonartzstudioz@gmail.com</p><p>+98940 25593</p><p>@neonartzstudioz</p><p>Worldwide Service</p></div></div><div class="copy">© <span id="year"></span> Neon Artz Studio. All Rights Reserved.</div></div></footer>
+  <a href="https://wa.me/919999999999?text=Hi%20Neon%20Artz%20Studio,%20I%20need%20service%20details" class="whatsapp" target="_blank">☘</a>
+
+  <script>
+    const header=document.getElementById('header'),progress=document.getElementById('progress'),menu=document.getElementById('menu'),hamb=document.getElementById('hamb');
+    document.getElementById('year').textContent=new Date().getFullYear();
+    window.addEventListener('scroll',()=>{header.classList.toggle('scrolled',scrollY>40);const h=document.documentElement;progress.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100+'%'});
+    hamb.addEventListener('click',()=>menu.classList.toggle('open'));
+    document.querySelectorAll('.menu a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('open')));
+    const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+    document.querySelectorAll('.faq button').forEach(btn=>btn.addEventListener('click',()=>{btn.parentElement.classList.toggle('open');btn.querySelector('span').textContent=btn.parentElement.classList.contains('open')?'−':'+'}));
+    document.getElementById('contactForm').addEventListener('submit',e=>{e.preventDefault();alert('Thank you! We will contact you soon.');e.target.reset()});
+  
+
+    // Premium mouse moving style + glow + 3D tilt
+    const cursorDot=document.getElementById('cursorDot'),cursorRing=document.getElementById('cursorRing'),mouseGlow=document.getElementById('mouseGlow');
+    let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+    document.body.classList.add('cursor-active');
+    window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursorDot.style.left=mx+'px';cursorDot.style.top=my+'px';if(mouseGlow){mouseGlow.style.left=mx+'px';mouseGlow.style.top=my+'px';}});
+    function cursorLoop(){rx+=(mx-rx)*.16;ry+=(my-ry)*.16;cursorRing.style.left=rx+'px';cursorRing.style.top=ry+'px';requestAnimationFrame(cursorLoop)}cursorLoop();
+    document.querySelectorAll('a,button,.card,.creative-card,.img-frame').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-hover'));el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-hover'))});
+    document.querySelectorAll('.card,.creative-card').forEach(card=>{card.classList.add('tilt-card');card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;const rotateY=((x/r.width)-.5)*10;const rotateX=((y/r.height)-.5)*-10;card.style.transform=`perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`});card.addEventListener('mouseleave',()=>{card.style.transform=''})});
+    document.getElementById('theme')?.addEventListener('click',()=>{document.body.classList.toggle('party-mode')});
+
+  </script>
+ 
+</body>
+</html>
