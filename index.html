@@ -1,1007 +1,580 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Location Tracker & Date Area Dashboard</title>
+    <title>Hotel Daily Closing Report - Night Audit</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 15px;
-        }
-        /* Login Page Overlay Styles */
-        #loginOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .login-card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .login-card h2 {
-            text-align: center;
-            margin-top: 0;
-            color: #333;
-        }
-
-        .container {
-            max-width: 980px;
-            margin: auto;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: none; /* Hidden until login */
-        }
-        h2.dashboard-title {
-            text-align: center;
-            color: #333;
-            font-size: 22px;
-            margin-bottom: 10px;
-        }
-        
-        /* Top Summary Wrapper Layout */
-        .summary-wrapper {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        .summary-card {
-            flex: 1;
-            min-width: 130px;
-            color: white;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            text-align: center;
-            font-weight: bold;
-        }
-        .bg-existing { background: linear-gradient(135deg, #17a2b8, #117a8b); }
-        .bg-hand { background: linear-gradient(135deg, #ff851b, #e0690b); }
-        .bg-collection { background: linear-gradient(135deg, #007bff, #0056b3); }
-        .bg-giving { background: linear-gradient(135deg, #28a745, #218838); cursor: pointer; }
-        .bg-giving:hover { opacity: 0.9; }
-
-        .summary-card h3 {
-            margin: 0;
-            font-size: 13px;
-            font-weight: normal;
-        }
-        .summary-card p {
-            margin: 4px 0 0 0;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .toggle-summary-btn {
-            background-color: #ffc107;
-            color: #000;
-            border: none;
-            padding: 3px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: bold;
-            margin-top: 4px;
-        }
-        .toggle-summary-btn:hover { background-color: #e0a800; }
-
-        /* Modal Popup Dashboard CSS */
-        .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 10; 
-            left: 0; top: 0; 
-            width: 100%; height: 100%; 
-            background-color: rgba(0,0,0,0.5); 
-            overflow: auto;
-            padding-top: 30px;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 600px;
-            border-radius: 10px;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close:hover { color: black; }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .form-group {
-            margin-bottom: 10px;
-        }
-        .form-group.full {
-            grid-column: span 2;
-        }
-        label {
-            display: block;
-            margin-bottom: 3px;
-            font-weight: bold;
-            color: #555;
-            font-size: 13px;
-        }
-        input[type="text"], input[type="password"], input[type="date"], input[type="datetime-local"] {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        .btn-container {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
-            flex: 1;
-        }
-        button:hover { opacity: 0.9; }
-        .clear-btn { background-color: #dc3545; }
-        .export-btn { background-color: #17a2b8; }
-        .import-btn { background-color: #ffc107; color: #333; }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 13px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #343a40;
-            color: white;
-        }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .map-link {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .map-link:hover { text-decoration: underline; }
-        .action-btns button {
-            padding: 4px 8px;
-            font-size: 12px;
-            margin-right: 3px;
-        }
-        .edit-btn { background-color: #ffc107; color: #000; }
-        .save-btn { background-color: #28a745; color: #fff; }
-        .delete-btn { background-color: #dc3545; color: #fff; }
-        .ok-btn { background-color: #28a745; padding: 4px 8px; font-size: 12px; }
-        .inline-input { width: 70px; padding: 4px; font-size: 12px; }
-        
-        .admin-info-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #e9ecef;
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            font-size: 13px;
-            flex-wrap: wrap;
-            gap: 5px;
+        body { font-family: 'Inter', sans-serif; }
+        @media print {
+            body { background: white !important; }
+            .no-print { display: none !important; }
+            .print-shadow { box-shadow: none !important; }
+            input, select { border: none !important; background: transparent !important; padding: 0 !important; }
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 h-full antialiased flex flex-col justify-between">
 
-<!-- Admin Login Overlay Screen -->
-<div id="loginOverlay">
-    <div class="login-card">
-        <h2>🔐 Admin Login & Area/Date Setup</h2>
-        <div class="form-group">
-            <label for="loginUsername">User Name:</label>
-            <input type="text" id="loginUsername" placeholder="Enter username" value="Admin">
-        </div>
-        <div class="form-group">
-            <label for="loginUserid">User ID:</label>
-            <input type="text" id="loginUserid" placeholder="Enter User ID" value="001">
-        </div>
-        <div class="form-group">
-            <label for="loginPassword">Password:</label>
-            <input type="password" id="loginPassword" placeholder="Enter password" value="1234">
-        </div>
-        <div class="form-group">
-            <label for="loginTargetArea">Target Area / Ooru Name:</label>
-            <input type="text" id="loginTargetArea" placeholder="E.g., Salem Route" value="Salem Route">
-        </div>
-        <div class="form-group">
-            <label for="loginDate">Select Date:</label>
-            <input type="date" id="loginDate">
-        </div>
-        <div class="form-group">
-            <label for="loginExistingCash">Existing Cash (₹):</label>
-            <input type="text" id="loginExistingCash" placeholder="Enter cash in hand" value="5000">
-        </div>
-        <button type="button" onclick="handleAdminLogin()" style="width:100%; margin-top:10px;">Start Dashboard</button>
-    </div>
-</div>
-
-<!-- Main Dashboard Container -->
-<div class="container" id="mainDashboard">
-    <div class="admin-info-bar">
-        <span>👤 User: <b id="displayAdminName">-</b> | 📍 Area: <b id="displayTargetArea" style="color:#007bff;">-</b> | 📅 Date: <b id="displayAdminDate" style="color:#28a745;">-</b></span>
-        <button type="button" onclick="handleLogout()" style="background:#dc3545; padding:4px 10px; font-size:12px; flex:none;">Change Setup / Logout</button>
-    </div>
-
-    <h2 class="dashboard-title">📍 Location Tracker Dashboard</h2>
-
-    <!-- Top Summary Cards Wrapper -->
-    <div class="summary-wrapper">
-        <div class="summary-card bg-existing">
-            <h3>Existing Cash</h3>
-            <p id="displayExistingCash">₹0</p>
-        </div>
-
-        <div class="summary-card bg-hand">
-            <h3>Cash on Hand</h3>
-            <p id="displayCashOnHand">₹0</p>
-        </div>
-
-        <div class="summary-card bg-collection">
-            <h3>Total Collection</h3>
-            <p id="totalAmountDisplay">₹0</p>
-            <button type="button" id="toggleBtn" class="toggle-summary-btn" onclick="toggleTotalAmount()">👁️ Show</button>
-        </div>
-
-        <div class="summary-card bg-giving" onclick="openGiveModal()">
-            <h3>Giving Dashboard</h3>
-            <p id="totalGiveButtonDisplay">₹0</p>
-        </div>
-    </div>
-    
-    <input type="hidden" id="editIndex" value="-1">
-
-    <div class="form-grid">
-        <div class="form-group">
-            <label for="idNumber">ID Number / Serial No:</label>
-            <input type="text" id="idNumber" placeholder="E.g., 1, 2, 3...">
-        </div>
-        
-        <div class="form-group">
-            <label for="locationName">Location Name:</label>
-            <input type="text" id="locationName" placeholder="Shop / Customer Name">
-        </div>
-
-        <div class="form-group">
-            <label for="paymentDetails">Payment / Amount (Numbers only):</label>
-            <input type="text" id="paymentDetails" placeholder="E.g., 1500">
-        </div>
-
-        <div class="form-group">
-            <label for="dateTime">Time Details:</label>
-            <input type="datetime-local" id="dateTime">
-        </div>
-
-        <div class="form-group full">
-            <label for="additionalDetails">Additional Details / Notes:</label>
-            <input type="text" id="additionalDetails" placeholder="Contact number, items, notes...">
-        </div>
-    </div>
-    
-    <div class="btn-container">
-        <button type="button" onclick="recordLocationGPS()">📍 Record GPS</button>
-        <button type="button" id="saveUpdateBtn" onclick="saveOrUpdateLocation()">💾 Confirm & Save</button>
-        <button type="button" id="updateRowBtn" onclick="saveRowUpdate()" style="display:none; background-color:#ffc107; color:#000;">🔄 Save Edited Row</button>
-    </div>
-
-    <div class="btn-container" style="margin-top: 10px;">
-        <button type="button" class="export-btn" onclick="exportDataBackup()">📥 Backup Download</button>
-        <button type="button" class="import-btn" onclick="document.getElementById('importFile').click()">📤 Restore Backup</button>
-        <input type="file" id="importFile" style="display:none" accept=".json" onchange="importDataBackup(event)">
-        <button type="button" class="clear-btn" onclick="clearAllData()">🗑️ Clear All</button>
-    </div>
-
-    <h3>Saved Locations List (<span id="tableAreaTitle" style="color:#007bff;">Area</span>)</h3>
-    <div style="overflow-x:auto;">
-        <table id="locationTable">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>Date</th>
-                    <th>ID</th>
-                    <th>Location & Details</th>
-                    <th>Payment History & Current</th>
-                    <th>Map</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- Data will load here -->
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal Popup for Giving / Assign Dashboard -->
-<div id="giveModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeGiveModal()">&times;</span>
-        <h3 style="margin-top:0; color:#333;">💸 Giving Collection Dashboard</h3>
-        
-        <input type="hidden" id="giveEditIndex" value="-1">
-
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="givePersonName">Person Name:</label>
-                <input type="text" id="givePersonName" placeholder="Receiver Name">
+    <!-- Top Navigation Bar / Header -->
+    <header class="bg-slate-900 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500 text-slate-950 p-2.5 rounded-xl font-bold text-lg shadow">
+                    <i class="fa-solid fa-hotel"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight">Hotel RAKS - Daily Closing Report</h1>
+                    <p class="text-xs text-slate-400">Night Audit & Automated Cash Settlement</p>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="giveAmount">Amount Given (₹):</label>
-                <input type="text" id="giveAmount" placeholder="Amount numbers">
+            <div class="flex items-center gap-3">
+                <button onclick="resetReport()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-lg text-xs font-semibold transition border border-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Reset Form
+                </button>
+                <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Print Report
+                </button>
             </div>
+        </div>
+    </header>
 
-            <div class="form-group">
-                <label for="giveIdNumber">ID Number:</label>
-                <input type="text" id="giveIdNumber" placeholder="ID No.">
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow space-y-6">
+
+        <!-- Report Meta Information Bar -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Date</span>
+                <input type="text" id="reportDate" value="11.11.2026" class="mt-1 font-bold text-slate-800 bg-transparent w-full focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-1">
             </div>
-
-            <div class="form-group">
-                <label for="giveContact">Contact Number:</label>
-                <input type="text" id="giveContact" placeholder="Phone Number">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Shift</span>
+                <input type="text" id="reportShift" value="NIGHT SHIFT" class="mt-1 font-bold text-slate-800 bg-transparent w-full focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-1 uppercase">
             </div>
-
-            <div class="form-group full">
-                <label for="giveDateTime">Date & Time:</label>
-                <input type="datetime-local" id="giveDateTime">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Staff Name</span>
+                <input type="text" id="reportStaff" value="KANNA .N" class="mt-1 font-bold text-slate-800 bg-transparent w-full focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-1 uppercase">
+            </div>
+            <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                <span class="block text-[11px] font-bold text-amber-800 uppercase tracking-wider">Opening Cash (FO Total)</span>
+                <span id="metaOpeningDisplay" class="mt-1 font-extrabold text-amber-700 text-lg block">0</span>
             </div>
         </div>
 
-        <button type="button" id="giveSaveUpdateBtn" onclick="saveOrUpdateGiveRecord()" style="width:100%; margin-top:10px;">Save Giving Record</button>
-
-        <h4 style="margin:15px 0 5px 0;">Given Records List</h4>
-        <div style="overflow-x:auto; max-height:200px;">
-            <table id="giveTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Amount</th>
-                        <th>ID / Contact</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="giveTableBody">
-                    <!-- Data will load here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<script>
-    window.onload = function() {
-        const today = new Date().toISOString().split('T')[0];
-        const dateInput = document.getElementById("loginDate");
-        if(dateInput && !dateInput.value) {
-            dateInput.value = today;
-        }
-        checkAdminSession();
-    };
-
-    function checkAdminSession() {
-        const adminSession = localStorage.getItem("adminSession");
-        if (adminSession) {
-            try {
-                const adminData = JSON.parse(adminSession);
-                document.getElementById("displayAdminName").innerText = adminData.username || "Admin";
-                document.getElementById("displayTargetArea").innerText = adminData.targetArea || "General";
-                document.getElementById("tableAreaTitle").innerText = (adminData.targetArea || "General") + " (All History & Date Wise)";
-                document.getElementById("displayAdminDate").innerText = adminData.selectedDate || new Date().toISOString().split('T')[0];
+        <!-- Master Summary Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-sky-900 text-white px-6 py-3.5 font-bold text-xs tracking-wider uppercase flex justify-between items-center">
+                <span>Closing Report Summary Breakdown</span>
+                <span class="text-[11px] bg-sky-800 px-3 py-1 rounded text-sky-200 font-medium">Live Calculation Engine</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
                 
-                document.getElementById("loginOverlay").style.display = "none";
-                document.getElementById("mainDashboard").style.display = "block";
-                
-                setCurrentDateTime();
-                loadTableData();
-                loadGiveTableData();
-                return;
-            } catch(e) {
-                localStorage.removeItem("adminSession");
-            }
-        }
-        document.getElementById("loginOverlay").style.display = "flex";
-        document.getElementById("mainDashboard").style.display = "none";
-    }
-
-    function handleAdminLogin() {
-        const username = document.getElementById("loginUsername").value.trim() || "Admin";
-        const userid = document.getElementById("loginUserid").value.trim() || "001";
-        const password = document.getElementById("loginPassword").value.trim() || "1234";
-        const targetArea = document.getElementById("loginTargetArea").value.trim() || "Salem Route";
-        let selectedDate = document.getElementById("loginDate").value;
-        if(!selectedDate) {
-            selectedDate = new Date().toISOString().split('T')[0];
-        }
-        const existingCash = document.getElementById("loginExistingCash").value.trim() || "5000";
-
-        const adminData = {
-            username: username,
-            userid: userid,
-            targetArea: targetArea,
-            selectedDate: selectedDate,
-            existingCash: existingCash,
-            initialCash: existingCash
-        };
-
-        localStorage.setItem("adminSession", JSON.stringify(adminData));
-        checkAdminSession();
-    }
-
-    function handleLogout() {
-        if (confirm("Do you want to switch setup or logout?")) {
-            localStorage.removeItem("adminSession");
-            checkAdminSession();
-        }
-    }
-
-    function setCurrentDateTime() {
-        const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
-        const loginDate = adminSession.selectedDate || new Date().toISOString().split('T')[0];
-        
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const currentFormatted = `${loginDate}T${hours}:${minutes}`;
-        
-        const dtEl = document.getElementById("dateTime");
-        const gDtEl = document.getElementById("giveDateTime");
-        if(dtEl) dtEl.value = currentFormatted;
-        if(gDtEl) gDtEl.value = currentFormatted;
-    }
-
-    let tempLat = null;
-    let tempLon = null;
-
-    function recordLocationGPS() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                tempLat = position.coords.latitude;
-                tempLon = position.coords.longitude;
-                alert("GPS Location Captured Successfully!");
-            }, function(error) {
-                alert("GPS Error: Please enable location permission.");
-            });
-        } else {
-            alert("Geolocation is not supported by your browser.");
-        }
-    }
-
-    function getStorageKey() {
-        const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
-        const areaName = adminSession.targetArea ? adminSession.targetArea.replace(/\s+/g, '_') : "General";
-        return `myLocations_${areaName}`;
-    }
-
-    function saveOrUpdateLocation() {
-        const idNo = document.getElementById("idNumber").value.trim();
-        const locName = document.getElementById("locationName").value.trim();
-        const payment = document.getElementById("paymentDetails").value.trim();
-        const dateTime = document.getElementById("dateTime").value;
-        const details = document.getElementById("additionalDetails").value.trim();
-        const editIdx = parseInt(document.getElementById("editIndex").value);
-
-        if (!locName) {
-            alert("Please enter Location Name!");
-            return;
-        }
-
-        const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
-        const loginDate = adminSession.selectedDate || new Date().toISOString().split('T')[0];
-
-        const storageKey = getStorageKey();
-        let locations = JSON.parse(localStorage.getItem(storageKey)) || [];
-
-        let lat = tempLat;
-        let lon = tempLon;
-
-        if (editIdx > -1) {
-            if (lat === null) {
-                lat = locations[editIdx].lat;
-                lon = locations[editIdx].lon;
-            }
-            
-            let history = locations[editIdx].paymentHistory || [];
-            if(payment) {
-                history.push({ date: loginDate, amount: payment });
-            }
-
-            locations[editIdx] = {
-                id: idNo || locations[editIdx].id,
-                date: locations[editIdx].date || loginDate, 
-                name: locName,
-                payment: payment || locations[editIdx].payment,
-                paymentHistory: history,
-                details: details,
-                lat: lat,
-                lon: lon
-            };
-            document.getElementById("editIndex").value = "-1";
-            document.getElementById("updateRowBtn").style.display = "none";
-            document.getElementById("saveUpdateBtn").style.display = "inline-block";
-        } else {
-            if (lat === null) {
-                lat = 13.0827; 
-                lon = 80.2707;
-            }
-            const newLocation = {
-                id: idNo || (locations.length + 1),
-                date: loginDate,
-                name: locName,
-                payment: payment || "0",
-                paymentHistory: payment ? [{ date: loginDate, amount: payment }] : [],
-                details: details,
-                lat: lat,
-                lon: lon
-            };
-            locations.push(newLocation);
-        }
-
-        localStorage.setItem(storageKey, JSON.stringify(locations));
-        clearForm();
-        loadTableData();
-        loadGiveTableData();
-        alert("Location Saved Successfully for Date: " + loginDate);
-    }
-
-    function saveRowUpdate() {
-        saveOrUpdateLocation();
-    }
-
-    function clearForm() {
-        document.getElementById("idNumber").value = "";
-        document.getElementById("locationName").value = "";
-        document.getElementById("paymentDetails").value = "";
-        document.getElementById("additionalDetails").value = "";
-        tempLat = null;
-        tempLon = null;
-        setCurrentDateTime();
-    }
-
-    let isTotalVisible = false;
-
-    function toggleTotalAmount() {
-        const displayPara = document.getElementById("totalAmountDisplay");
-        const btn = document.getElementById("toggleBtn");
-
-        isTotalVisible = !isTotalVisible;
-        if (isTotalVisible) {
-            displayPara.style.display = "block";
-            btn.innerText = "🔒 Hide";
-        } else {
-            displayPara.style.display = "none";
-            btn.innerText = "👁️ Show";
-        }
-    }
-
-    function loadTableData() {
-        const tableBody = document.getElementById("tableBody");
-        tableBody.innerHTML = "";
-
-        const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
-        const loginDate = adminSession.selectedDate || new Date().toISOString().split('T')[0];
-
-        const storageKey = getStorageKey();
-        let locations = JSON.parse(localStorage.getItem(storageKey)) || [];
-        let dateCollectionSum = 0; 
-
-        locations.forEach((loc, index) => {
-            const row = document.createElement("tr");
-            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lon}`;
-
-            let dateDisplayStyle = "";
-            let dateNote = "";
-            if (loc.date && loc.date !== loginDate) {
-                dateDisplayStyle = "color: red; font-weight: bold;";
-                dateNote = " (Prev)";
-            }
-
-            let historyHtml = "";
-            if (loc.paymentHistory && loc.paymentHistory.length > 0) {
-                loc.paymentHistory.forEach((h, hIdx) => {
-                    let hDateStyle = (h.date !== loginDate) ? "color: red;" : "color: #28a745; font-weight: bold;";
-                    historyHtml += `<div id="hist-row-${index}-${hIdx}" style="margin-bottom:3px;">
-                        <span style="font-size:11px; ${hDateStyle}">📅 ${h.date}: ₹<span id="hist-val-${index}-${hIdx}">${h.amount}</span></span>
-                        <button type="button" class="edit-btn" style="padding:1px 4px; font-size:9px; margin-left:4px;" onclick="enableHistoryEdit(${index}, ${hIdx})">Edit</button>
-                    </div>`;
-                    
-                    if (h.date === loginDate) {
-                        let mNums = h.amount.match(/\d+/g);
-                        if (mNums) {
-                            dateCollectionSum += parseInt(mNums.join(""), 10);
-                        }
-                    }
-                });
-            } else {
-                historyHtml = `<span>₹${loc.payment || '0'}</span>`;
-                if (loc.date === loginDate) {
-                    let mNums = (loc.payment || "0").match(/\d+/g);
-                    if (mNums) {
-                        dateCollectionSum += parseInt(mNums.join(""), 10);
-                    }
-                }
-            }
-
-            row.innerHTML = `
-                <td>${index + 1}</td>
-                <td style="${dateDisplayStyle}">${loc.date || '-'}${dateNote}</td>
-                <td><b>${loc.id || '-'}</b></td>
-                <td>
-                    <b>${loc.name}</b><br>
-                    <span style="color: #666; font-size: 11px;">${loc.details || ''}</span>
-                </td>
-                <td id="pay-cell-${index}">
-                    ${historyHtml}
-                    <div style="margin-top:4px; border-top: 1px dashed #ccc; padding-top:3px;">
-                        <span>Current: ₹${loc.payment || '0'}</span>
-                        <button type="button" class="edit-btn" style="padding:2px 5px; font-size:10px; margin-left:5px;" onclick="enableInlinePay(${index})">Edit</button>
+                <!-- Column 1: Opening & Received / Vouchers -->
+                <div class="p-5 space-y-5">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b pb-2 mb-3">1. Base & Received Funds</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center bg-amber-50/60 p-2.5 rounded-lg border border-amber-100">
+                                <span class="text-xs font-semibold text-slate-700">Opening Cash (From F.O.):</span>
+                                <span id="summaryOpening" class="font-extrabold text-amber-700 text-base">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-semibold text-slate-600">Total Received Amount:</span>
+                                <span id="summaryReceivedTotal" class="font-bold text-sky-700">0</span>
+                            </div>
+                        </div>
                     </div>
-                </td>
-                <td><a href="${mapUrl}" target="_blank" class="map-link">Open Map</a></td>
-                <td class="action-btns">
-                    <button type="button" class="edit-btn" onclick="editLocation(${index})">Edit</button>
-                    <button type="button" class="delete-btn" onclick="deleteLocation(${index})">Del</button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
 
-        document.getElementById("totalAmountDisplay").innerText = `₹${dateCollectionSum.toLocaleString()}`;
-        loadGiveTableData(); 
-    }
+                    <!-- Dynamic Received List -->
+                    <div class="space-y-2 pt-2 border-t">
+                        <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                            <span>Received Items List</span>
+                            <span class="text-[10px] text-slate-400">Add entry below</span>
+                        </div>
+                        <div id="receivedListContainer" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                            <!-- Dynamic items -->
+                        </div>
+                        <div class="flex gap-2 pt-1 no-print">
+                            <input type="text" id="newRecName" placeholder="Name / Source" class="text-xs border rounded-lg px-2.5 py-1.5 flex-grow focus:outline-none focus:ring-1 focus:ring-sky-500 bg-slate-50">
+                            <input type="number" id="newRecAmt" placeholder="Amt" class="text-xs border rounded-lg px-2.5 py-1.5 w-20 focus:outline-none focus:ring-1 focus:ring-sky-500 bg-slate-50">
+                            <button onclick="addReceivedItem()" class="bg-sky-700 hover:bg-sky-800 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition">Add</button>
+                        </div>
+                    </div>
+                </div>
 
-    function enableHistoryEdit(locIdx, histIdx) {
-        const storageKey = getStorageKey();
-        let locations = JSON.parse(localStorage.getItem(storageKey)) || [];
-        const histItem = locations[locIdx].paymentHistory[histIdx];
-        
-        const rowDiv = document.getElementById(`hist-row-${locIdx}-${histIdx}`);
-        rowDiv.innerHTML = `
-            <span style="font-size:11px;">📅 ${histItem.date}: </span>
-            <input type="text" id="edit-hist-input-${locIdx}-${histIdx}" class="inline-input" value="${histItem.amount}">
-            <button type="button" class="ok-btn" onclick="saveHistoryEdit(${locIdx}, ${histIdx})">OK</button>
-        `;
-    }
+                <!-- Column 2: Department Totals & Voucher Expenses -->
+                <div class="p-5 space-y-5">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b pb-2 mb-3">2. Department Collections</h3>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-slate-600">Restaurant:</span>
+                                <span id="sumRestTotal" class="font-bold text-slate-800">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-slate-600">Bar:</span>
+                                <span id="sumBarTotal" class="font-bold text-slate-800">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-slate-600">BQT (Bank Out):</span>
+                                <span id="sumBqtTotal" class="font-bold text-slate-800">0</span>
+                            </div>
+                        </div>
+                    </div>
 
-    function saveHistoryEdit(locIdx, histIdx) {
-        const storageKey = getStorageKey();
-        let locations = JSON.parse(localStorage.getItem(storageKey)) || [];
-        const newVal = document.getElementById(`edit-hist-input-${locIdx}-${histIdx}`).value.trim();
-        
-        locations[locIdx].paymentHistory[histIdx].amount = newVal || "0";
-        
-        if(histIdx === locations[locIdx].paymentHistory.length - 1) {
-            locations[locIdx].payment = newVal || "0";
-        }
+                    <!-- Voucher Expenses -->
+                    <div class="space-y-2 pt-3 border-t">
+                        <div class="flex justify-between items-center text-xs font-bold text-rose-600">
+                            <span>Voucher Expenses (-)</span>
+                            <span id="voucherTotalDisplay">0</span>
+                        </div>
+                        <div id="voucherListContainer" class="space-y-1.5 max-h-28 overflow-y-auto pr-1">
+                            <!-- Dynamic vouchers -->
+                        </div>
+                        <div class="flex gap-2 pt-1 no-print">
+                            <input type="text" id="newVoucherDesc" placeholder="Description" class="text-xs border rounded-lg px-2.5 py-1.5 flex-grow focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50">
+                            <input type="number" id="newVoucherAmt" placeholder="Amt" class="text-xs border rounded-lg px-2.5 py-1.5 w-20 focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50">
+                            <button onclick="addVoucherItem()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition">Add</button>
+                        </div>
+                    </div>
+                </div>
 
-        localStorage.setItem(storageKey, JSON.stringify(locations));
-        loadTableData();
-    }
+                <!-- Column 3: Final Closing & Formula Settlement -->
+                <div class="p-5 flex flex-col justify-between bg-slate-50/60">
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b pb-2">3. Final Settlement</h3>
+                        <div class="space-y-3 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-slate-600">Formula Breakdown:</span>
+                                <span class="text-[10px] text-slate-400">Opening + Rec + Rest + Bar + BQT - Vouch</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2 border-t">
+                                <span class="font-bold text-slate-700 text-sm">Calculated Closing:</span>
+                                <span id="finalCalculatedClosing" class="text-xl font-extrabold text-slate-900">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase text-slate-500">Audit Status:</span>
+                        <div id="auditStatusBadge" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> CORRECT
+                        </div>
+                    </div>
+                </div>
 
-    function enableInlinePay(index) {
-        const storageKey = getStorageKey();
-        let locations = JSON.parse(localStorage.getItem(storageKey)) || [];
-        const cell = document.getElementById(`pay-cell-${index}`);
-        const currentVal = locations[index].payment || "";
-        
-        cell.innerHTML = `
-            <input type="text" id="inline-pay-${index}" class="inline-input" value="${currentVal}">
-            <button type="button" class="ok-btn" onclick="saveInlinePay(${index})">OK</button>
-        `;
-    }
+            </div>
+        </div>
 
-    function saveInlinePay(index) {
-        const storageKey = getStorageKey();
-        let locations = JSON.parse(localStorage.getItem(storageKey)) || [];
-        const newVal = document.getElementById(`inline-pay-${index}`).value.trim();
-        
-        const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
-        const loginDate = adminSession.selectedDate || new Date().toISOString().split('T')[0];
+        <!-- Denominations & Collections Section -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-sky-700"></i> Cash Denomination Breakdowns & Department Collections
+                </h2>
+                <span class="text-xs text-slate-500">Front Office Cash total feeds directly into Opening Cash</span>
+            </div>
 
-        let history = locations[index].paymentHistory || [];
-        history.push({ date: loginDate, amount: newVal || "0" });
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Front Office Cash -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-sky-800 text-white text-center py-2.5 text-xs font-bold uppercase tracking-wider">
+                        Front Office Cash <span class="block text-[10px] font-normal text-sky-200">(Feeds Opening Cash)</span>
+                    </div>
+                    <div class="p-3.5 flex-grow">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="pb-1.5 text-left font-semibold">Note</th>
+                                    <th class="pb-1.5 text-center font-semibold">Count</th>
+                                    <th class="pb-1.5 text-right font-semibold">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="denom-foc" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <div class="bg-amber-300 p-3 flex justify-between items-center font-bold text-slate-950 text-xs">
+                        <span>F.O. TOTAL</span>
+                        <span id="total-foc" class="text-sm font-extrabold">0</span>
+                    </div>
+                </div>
 
-        locations[index].payment = newVal || "0";
-        locations[index].paymentHistory = history;
+                <!-- Restaurant Cash -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-sky-800 text-white text-center py-2.5 text-xs font-bold uppercase tracking-wider">
+                        Restaurant Collection
+                    </div>
+                    <div class="p-3.5 flex-grow">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="pb-1.5 text-left font-semibold">Note</th>
+                                    <th class="pb-1.5 text-center font-semibold">Count</th>
+                                    <th class="pb-1.5 text-right font-semibold">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="denom-rest" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <div class="bg-amber-300 p-3 flex justify-between items-center font-bold text-slate-950 text-xs">
+                        <span>REST. TOTAL</span>
+                        <span id="total-rest" class="text-sm font-extrabold">0</span>
+                    </div>
+                </div>
 
-        localStorage.setItem(storageKey, JSON.stringify(locations));
-        loadTableData();
-    }
+                <!-- Bar Cash -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-sky-800 text-white text-center py-2.5 text-xs font-bold uppercase tracking-wider">
+                        Bar Collection
+                    </div>
+                    <div class="p-3.5 flex-grow">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="pb-1.5 text-left font-semibold">Note</th>
+                                    <th class="pb-1.5 text-center font-semibold">Count</th>
+                                    <th class="pb-1.5 text-right font-semibold">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="denom-bar" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <div class="bg-amber-300 p-3 flex justify-between items-center font-bold text-slate-950 text-xs">
+                        <span>BAR TOTAL</span>
+                        <span id="total-bar" class="text-sm font-extrabold">0</span>
+                    </div>
+                </div>
 
-    function editLocation(index) {
-        const storageKey = getStorageKey();
-        let locations = JSON.parse(localStorage.getItem(storageKey)) || [];
-        const loc = locations[index];
+                <!-- BQT Cash -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-sky-800 text-white text-center py-2.5 text-xs font-bold uppercase tracking-wider">
+                        BQT / Bank Out
+                    </div>
+                    <div class="p-3.5 flex-grow">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="pb-1.5 text-left font-semibold">Note</th>
+                                    <th class="pb-1.5 text-center font-semibold">Count</th>
+                                    <th class="pb-1.5 text-right font-semibold">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="denom-bqt" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <div class="bg-amber-300 p-3 flex justify-between items-center font-bold text-slate-950 text-xs">
+                        <span>BQT TOTAL</span>
+                        <span id="total-bqt" class="text-sm font-extrabold">0</span>
+                    </div>
+                </div>
 
-        document.getElementById("idNumber").value = loc.id || "";
-        document.getElementById("locationName").value = loc.name || "";
-        document.getElementById("paymentDetails").value = loc.payment || "";
-        document.getElementById("additionalDetails").value = loc.details || "";
-        document.getElementById("editIndex").value = index;
-        
-        // Show update row button next to confirm save
-        document.getElementById("updateRowBtn").style.display = "inline-block";
-        document.getElementById("saveUpdateBtn").style.display = "none";
+            </div>
+        </div>
 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+        <!-- Advance Bookings & Reservations Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-900 text-white px-6 py-3.5 font-bold text-xs tracking-wider uppercase flex justify-between items-center">
+                <span>Advance Bookings & Reservations (Interactive Table)</span>
+                <button onclick="addAdvanceRow()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition no-print flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Add Booking Row
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left">
+                    <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b">
+                        <tr>
+                            <th class="px-4 py-3 w-20">R. No</th>
+                            <th class="px-4 py-3 min-w-[280px]">Name (Full Width / Unclipped)</th>
+                            <th class="px-4 py-3 text-center w-28">No of Persons</th>
+                            <th class="px-4 py-3 w-36">Adv / Amount</th>
+                            <th class="px-4 py-3 w-32">Adv Date</th>
+                            <th class="px-4 py-3 w-28">Adv Bill No</th>
+                            <th class="px-4 py-3 text-center w-20 no-print">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="advanceTableBody" class="divide-y divide-slate-200">
+                        <!-- Fully editable blank/custom rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    function deleteLocation(index) {
-        if (confirm("Are you sure you want to delete this location?")) {
-            const storageKey = getStorageKey();
-            let locations = JSON.parse(localStorage.getItem(storageKey)) || [];
-            locations.splice(index, 1);
-            localStorage.setItem(storageKey, JSON.stringify(locations));
-            loadTableData();
-        }
-    }
+    </main>
 
-    // Modal Control Functions
-    function openGiveModal() {
-        document.getElementById("giveModal").style.display = "block";
-    }
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-4 text-center text-xs text-slate-500 no-print">
+        <p>Hotel RAKS Management System &bull; Night Audit Report &copy; 2026</p>
+    </footer>
 
-    function closeGiveModal() {
-        document.getElementById("giveModal").style.display = "none";
-        clearGiveForm();
-    }
+    <!-- JavaScript Application Logic -->
+    <script>
+        const denominations = [500, 200, 100, 50, 20, 10, 5];
 
-    function clearGiveForm() {
-        document.getElementById("givePersonName").value = "";
-        document.getElementById("giveAmount").value = "";
-        document.getElementById("giveIdNumber").value = "";
-        document.getElementById("giveContact").value = "";
-        document.getElementById("giveEditIndex").value = "-1";
-        document.getElementById("giveSaveUpdateBtn").innerText = "Save Giving Record";
-        document.getElementById("giveSaveUpdateBtn").style.backgroundColor = "#28a745";
-        setCurrentDateTime();
-    }
-
-    function getGiveStorageKey() {
-        const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
-        const areaName = adminSession.targetArea ? adminSession.targetArea.replace(/\s+/g, '_') : "General";
-        return `giveRecords_${areaName}`;
-    }
-
-    function saveOrUpdateGiveRecord() {
-        const name = document.getElementById("givePersonName").value.trim();
-        const amount = document.getElementById("giveAmount").value.trim();
-        const idNo = document.getElementById("giveIdNumber").value.trim();
-        const contact = document.getElementById("giveContact").value.trim();
-        const dateTime = document.getElementById("giveDateTime").value;
-        const editIdx = parseInt(document.getElementById("giveEditIndex").value);
-
-        if (!name) {
-            alert("Please enter Person Name!");
-            return;
-        }
-
-        const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
-        const loginDate = adminSession.selectedDate || new Date().toISOString().split('T')[0];
-
-        const giveKey = getGiveStorageKey();
-        let giveRecords = JSON.parse(localStorage.getItem(giveKey)) || [];
-
-        if (editIdx > -1) {
-            giveRecords[editIdx] = {
-                name: name,
-                amount: amount || "0",
-                idNo: idNo,
-                contact: contact,
-                date: loginDate 
-            };
-            document.getElementById("giveEditIndex").value = "-1";
-            document.getElementById("giveSaveUpdateBtn").innerText = "Save Giving Record";
-            document.getElementById("giveSaveUpdateBtn").style.backgroundColor = "#28a745";
-        } else {
-            const newRecord = {
-                name: name,
-                amount: amount || "0",
-                idNo: idNo,
-                contact: contact,
-                date: loginDate
-            };
-            giveRecords.push(newRecord);
-        }
-
-        localStorage.setItem(giveKey, JSON.stringify(giveRecords));
-        clearGiveForm();
-        loadGiveTableData();
-        alert("Giving Record Saved Successfully!");
-    }
-
-    function loadGiveTableData() {
-        const tableBody = document.getElementById("giveTableBody");
-        tableBody.innerHTML = "";
-
-        const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
-        const loginDate = adminSession.selectedDate || new Date().toISOString().split('T')[0];
-
-        const giveKey = getGiveStorageKey();
-        let giveRecords = JSON.parse(localStorage.getItem(giveKey)) || [];
-        let dateGiveSum = 0; 
-
-        giveRecords.forEach((rec, index) => {
-            const row = document.createElement("tr");
-
-            let recDate = rec.date ? rec.date.split('T')[0] : loginDate;
-            let dateStyle = "";
-            let dateTag = "";
-            if (recDate !== loginDate) {
-                dateStyle = "color: red; font-weight: bold;";
-                dateTag = " (Prev)";
-            } else {
-                let matchedNums = (rec.amount || "0").match(/\d+/g);
-                if (matchedNums) {
-                    dateGiveSum += parseInt(matchedNums.join(""), 10);
-                }
-            }
-
-            row.innerHTML = `
-                <td><b>${rec.name}</b></td>
-                <td>₹${rec.amount}</td>
-                <td>ID: ${rec.idNo || '-'}<br>Ph: ${rec.contact || '-'}</td>
-                <td style="${dateStyle}">${rec.date || loginDate}${dateTag}</td>
-                <td class="action-btns">
-                    <button type="button" class="edit-btn" onclick="editGiveRecord(${index})">Edit</button>
-                    <button type="button" class="delete-btn" onclick="deleteGiveRecord(${index})">Del</button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        document.getElementById("totalGiveButtonDisplay").innerText = `₹${dateGiveSum.toLocaleString()}`;
-        updateCashCalculations(dateGiveSum);
-    }
-
-    function updateCashCalculations(dateGiveSum) {
-        const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
-        let initialCash = parseInt(adminSession.initialCash || "0", 10);
-
-        const totalCollText = document.getElementById("totalAmountDisplay").innerText;
-        let collNums = totalCollText.match(/\d+/g);
-        let totalCollection = collNums ? parseInt(collNums.join(""), 10) : 0;
-
-        let cashOnHand = totalCollection - dateGiveSum;
-
-        let updatedExistingCash = initialCash;
-        if (cashOnHand < 0) {
-            updatedExistingCash = initialCash + cashOnHand; 
-            if (updatedExistingCash < 0) updatedExistingCash = 0;
-        }
-
-        document.getElementById("displayExistingCash").innerText = `₹${updatedExistingCash.toLocaleString()}`;
-        document.getElementById("displayCashOnHand").innerText = `₹${cashOnHand.toLocaleString()}`;
-    }
-
-    function editGiveRecord(index) {
-        const giveKey = getGiveStorageKey();
-        let giveRecords = JSON.parse(localStorage.getItem(giveKey)) || [];
-        const rec = giveRecords[index];
-
-        document.getElementById("givePersonName").value = rec.name || "";
-        document.getElementById("giveAmount").value = rec.amount || "";
-        document.getElementById("giveIdNumber").value = rec.idNo || "";
-        document.getElementById("giveContact").value = rec.contact || "";
-        document.getElementById("giveEditIndex").value = index;
-
-        document.getElementById("giveSaveUpdateBtn").innerText = "Update Giving Record";
-        document.getElementById("giveSaveUpdateBtn").style.backgroundColor = "#ffc107";
-    }
-
-    function deleteGiveRecord(index) {
-        if (confirm("Are you sure you want to delete this giving record?")) {
-            const giveKey = getGiveStorageKey();
-            let giveRecords = JSON.parse(localStorage.getItem(giveKey)) || [];
-            giveRecords.splice(index, 1);
-            localStorage.setItem(giveKey, JSON.stringify(giveRecords));
-            loadGiveTableData();
-        }
-    }
-
-    function clearAllData() {
-        if (confirm("Do you want to clear all data for this area?")) {
-            const storageKey = getStorageKey();
-            const giveKey = getGiveStorageKey();
-            localStorage.removeItem(storageKey);
-            localStorage.removeItem(giveKey);
-            loadTableData();
-            loadGiveTableData();
-        }
-    }
-
-    function exportDataBackup() {
-        const adminSession = localStorage.getItem("adminSession") || "{}";
-        const adminData = JSON.parse(adminSession);
-        const areaName = adminData.targetArea ? adminData.targetArea.replace(/\s+/g, '_') : "General";
-        
-        let locData = localStorage.getItem(`myLocations_${areaName}`) || "[]";
-        let giveData = localStorage.getItem(`giveRecords_${areaName}`) || "[]";
-        
-        let combined = JSON.stringify({ 
-            area: adminData.targetArea,
-            locations: JSON.parse(locData), 
-            gives: JSON.parse(giveData),
-            admin: adminData
-        });
-        
-        const blob = new Blob([combined], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `Location_Backup_${areaName}_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-    }
-
-    function importDataBackup(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (data.locations && data.gives && data.area) {
-                    const areaName = data.area.replace(/\s+/g, '_');
-                    localStorage.setItem(`myLocations_${areaName}`, JSON.stringify(data.locations));
-                    localStorage.setItem(`giveRecords_${areaName}`, JSON.stringify(data.gives));
-                    if(data.admin) {
-                        localStorage.setItem("adminSession", JSON.stringify(data.admin));
-                    }
-                    location.reload();
-                    alert("Backup Restored Successfully for Area: " + data.area);
-                } else {
-                    alert("Invalid backup file format!");
-                }
-            } catch (err) {
-                alert("Error reading backup file!");
-            }
+        // Application State
+        let state = {
+            foc: { 500: 4, 200: 9, 100: 2, 50: 1, 20: 2, 10: 0, 5: 0 },
+            rest: { 500: 0, 200: 0, 100: 0, 50: 0, 20: 0, 10: 0, 5: 0 },
+            bar: { 500: 38, 200: 0, 100: 1, 50: 0, 20: 2, 10: 0, 5: 0 },
+            bqt: { 500: 0, 200: 0, 100: 0, 50: 0, 20: 0, 10: 0, 5: 0 },
+            receivedList: [
+                { name: 'ROOM 102 - BALANCE', amount: 0 }
+            ],
+            vouchers: [
+                { desc: 'DISHWASH', amount: 100 }
+            ],
+            advBookings: [
+                { rNo: '103', name: 'GOWTHAMAN/ABBOTS PVT LTD', persons: 1, amount: '-', date: '-', billNo: '-' },
+                { rNo: '215', name: 'KARTHIKEYAN', persons: 2, amount: '5000 /CASH', date: '06.11.2026', billNo: '9814' },
+                { rNo: '409', name: 'ASVIN', persons: 2, amount: '2800 /UPI', date: '11.11.2026', billNo: '9829' },
+                { rNo: '408', name: 'BHAVAN SURIYA', persons: 2, amount: '3360 /UPI', date: '10.11.2026', billNo: '9828' },
+                { rNo: '308', name: 'RAVIKUMAR', persons: 2, amount: '-', date: '-', billNo: '-' },
+                { rNo: '403', name: 'MUTHUKUMARAN', persons: 1, amount: '-', date: '-', billNo: '-' },
+                { rNo: '203', name: 'GOWTHAM /ICICI BANK', persons: 1, amount: '-', date: '-', billNo: '-' }
+            ]
         };
-        reader.readAsText(file);
-    }
-</script>
 
+        window.onload = function() {
+            renderDenominations('foc');
+            renderDenominations('rest');
+            renderDenominations('bar');
+            renderDenominations('bqt');
+            renderReceivedList();
+            renderVouchers();
+            renderAdvanceBookings();
+            updateAllCalculations();
+        };
+
+        // Render Denominations Table
+        function renderDenominations(sectionKey) {
+            const tbody = document.getElementById(`denom-${sectionKey}`);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            denominations.forEach(denom => {
+                const count = state[sectionKey][denom] || 0;
+                const amt = count * denom;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-1.5 text-rose-600 font-bold">${denom}</td>
+                    <td class="py-1.5 text-center">
+                        <input type="number" min="0" value="${count}" 
+                            class="w-14 text-center border rounded py-0.5 text-xs bg-slate-50 focus:ring-1 focus:ring-sky-500 focus:outline-none font-medium"
+                            oninput="handleDenomChange('${sectionKey}', ${denom}, this.value)">
+                    </td>
+                    <td class="py-1.5 text-right font-semibold text-slate-700" id="amt-${sectionKey}-${denom}">${amt.toLocaleString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function handleDenomChange(sectionKey, denom, value) {
+            const val = parseInt(value) || 0;
+            state[sectionKey][denom] = val;
+            const amt = val * denom;
+            const amtEl = document.getElementById(`amt-${sectionKey}-${denom}`);
+            if (amtEl) amtEl.innerText = amt.toLocaleString();
+
+            const total = calculateSectionTotal(sectionKey);
+            document.getElementById(`total-${sectionKey}`).innerText = total.toLocaleString();
+
+            updateAllCalculations();
+        }
+
+        function calculateSectionTotal(sectionKey) {
+            return denominations.reduce((acc, denom) => acc + ((state[sectionKey][denom] || 0) * denom), 0);
+        }
+
+        // Received Items Management
+        function renderReceivedList() {
+            const container = document.getElementById('receivedListContainer');
+            container.innerHTML = '';
+            let total = 0;
+
+            state.receivedList.forEach((item, index) => {
+                const amt = Number(item.amount) || 0;
+                total += amt;
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center text-xs bg-slate-50 p-2 rounded-lg border border-slate-100';
+                div.innerHTML = `
+                    <span class="font-medium text-slate-700">${item.name}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-sky-700">+${amt.toLocaleString()}</span>
+                        <button onclick="removeReceivedItem(${index})" class="text-slate-400 hover:text-rose-600 no-print"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('summaryReceivedTotal').innerText = total.toLocaleString();
+            return total;
+        }
+
+        function addReceivedItem() {
+            const nameInput = document.getElementById('newRecName');
+            const amtInput = document.getElementById('newRecAmt');
+            const name = nameInput.value.trim().toUpperCase();
+            const amount = parseFloat(amtInput.value);
+
+            if (!name || isNaN(amount)) {
+                return;
+            }
+
+            state.receivedList.push({ name, amount });
+            nameInput.value = '';
+            amtInput.value = '';
+            renderReceivedList();
+            updateAllCalculations();
+        }
+
+        function removeReceivedItem(index) {
+            state.receivedList.splice(index, 1);
+            renderReceivedList();
+            updateAllCalculations();
+        }
+
+        // Voucher Expenses Management
+        function renderVouchers() {
+            const container = document.getElementById('voucherListContainer');
+            container.innerHTML = '';
+            let total = 0;
+
+            state.vouchers.forEach((v, index) => {
+                const amt = Number(v.amount) || 0;
+                total += amt;
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center text-xs bg-rose-50/50 p-2 rounded-lg border border-rose-100';
+                div.innerHTML = `
+                    <span class="font-medium text-slate-700">${v.desc}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-rose-600">-${amt.toLocaleString()}</span>
+                        <button onclick="removeVoucher(${index})" class="text-slate-400 hover:text-rose-600 no-print"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('voucherTotalDisplay').innerText = total.toLocaleString();
+            return total;
+        }
+
+        function addVoucherItem() {
+            const descInput = document.getElementById('newVoucherDesc');
+            const amtInput = document.getElementById('newVoucherAmt');
+            const desc = descInput.value.trim().toUpperCase();
+            const amount = parseFloat(amtInput.value);
+
+            if (!desc || isNaN(amount)) {
+                return;
+            }
+
+            state.vouchers.push({ desc, amount });
+            descInput.value = '';
+            amtInput.value = '';
+            renderVouchers();
+            updateAllCalculations();
+        }
+
+        function removeVoucher(index) {
+            state.vouchers.splice(index, 1);
+            renderVouchers();
+            updateAllCalculations();
+        }
+
+        // Advance Bookings Table Management
+        function renderAdvanceBookings() {
+            const tbody = document.getElementById('advanceTableBody');
+            tbody.innerHTML = '';
+
+            state.advBookings.forEach((b, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="px-4 py-2.5 font-medium text-slate-800"><input type="text" value="${b.rNo}" onchange="updateAdvBooking(${index}, 'rNo', this.value)" class="w-full border rounded px-2 py-1 bg-transparent focus:bg-white focus:ring-1 focus:ring-sky-500 font-medium"></td>
+                    <td class="px-4 py-2.5 font-semibold text-slate-700"><input type="text" value="${b.name}" onchange="updateAdvBooking(${index}, 'name', this.value)" class="w-full min-w-[260px] border rounded px-2.5 py-1 bg-transparent focus:bg-white focus:ring-1 focus:ring-sky-500 font-bold text-slate-900"></td>
+                    <td class="px-4 py-2.5 text-center"><input type="number" value="${b.persons}" onchange="updateAdvBooking(${index}, 'persons', this.value)" class="w-16 text-center border rounded px-2 py-1 bg-transparent focus:bg-white focus:ring-1 focus:ring-sky-500"></td>
+                    <td class="px-4 py-2.5 font-medium"><input type="text" value="${b.amount}" onchange="updateAdvBooking(${index}, 'amount', this.value)" class="w-full border rounded px-2 py-1 bg-transparent focus:bg-white focus:ring-1 focus:ring-sky-500"></td>
+                    <td class="px-4 py-2.5 text-slate-600"><input type="text" value="${b.date}" onchange="updateAdvBooking(${index}, 'date', this.value)" class="w-full border rounded px-2 py-1 bg-transparent focus:bg-white focus:ring-1 focus:ring-sky-500"></td>
+                    <td class="px-4 py-2.5 text-slate-600"><input type="text" value="${b.billNo}" onchange="updateAdvBooking(${index}, 'billNo', this.value)" class="w-full border rounded px-2 py-1 bg-transparent focus:bg-white focus:ring-1 focus:ring-sky-500"></td>
+                    <td class="px-4 py-2.5 text-center no-print">
+                        <button onclick="removeAdvanceRow(${index})" class="text-slate-400 hover:text-rose-600 transition p-1"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateAdvBooking(index, field, val) {
+            state.advBookings[index][field] = val.toUpperCase();
+        }
+
+        function addAdvanceRow() {
+            state.advBookings.push({ rNo: '', name: '', persons: 1, amount: '-', date: '-', billNo: '-' });
+            renderAdvanceBookings();
+        }
+
+        function removeAdvanceRow(index) {
+            state.advBookings.splice(index, 1);
+            renderAdvanceBookings();
+        }
+
+        // Master Summary & Dynamic Opening Cash Calculation
+        function updateAllCalculations() {
+            // 1. Opening Cash is strictly driven by Front Office Cash Total
+            const focTotal = calculateSectionTotal('foc');
+            document.getElementById('total-foc').innerText = focTotal.toLocaleString();
+            document.getElementById('summaryOpening').innerText = focTotal.toLocaleString();
+            document.getElementById('metaOpeningDisplay').innerText = focTotal.toLocaleString();
+
+            // 2. Department totals
+            const restTotal = calculateSectionTotal('rest');
+            const barTotal = calculateSectionTotal('bar');
+            const bqtTotal = calculateSectionTotal('bqt');
+
+            document.getElementById('sumRestTotal').innerText = restTotal.toLocaleString();
+            document.getElementById('sumBarTotal').innerText = barTotal.toLocaleString();
+            document.getElementById('sumBqtTotal').innerText = bqtTotal.toLocaleString();
+
+            document.getElementById('total-rest').innerText = restTotal.toLocaleString();
+            document.getElementById('total-bar').innerText = barTotal.toLocaleString();
+            document.getElementById('total-bqt').innerText = bqtTotal.toLocaleString();
+
+            // 3. Received total
+            const receivedTotal = state.receivedList.reduce((acc, item) => acc + (Number(item.amount) || 0), 0);
+
+            // 4. Voucher total
+            const voucherTotal = state.vouchers.reduce((acc, v) => acc + (Number(v.amount) || 0), 0);
+
+            // 5. Final Closing Calculation Formula:
+            // Closing = Opening Cash (FO Total) + Received Total + Rest + Bar + BQT - Voucher Expenses
+            const finalClosing = focTotal + receivedTotal + restTotal + barTotal + bqtTotal - voucherTotal;
+            document.getElementById('finalCalculatedClosing').innerText = finalClosing.toLocaleString();
+        }
+
+        function resetReport() {
+            if (confirm('Are you sure you want to reset all entered data?')) {
+                window.location.reload();
+            }
+        }
+    </script>
 </body>
 </html>
