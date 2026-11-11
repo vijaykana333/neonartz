@@ -1,1480 +1,425 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hotel RAKS - Front Office Management System</title>
-    <!-- Tailwind CSS (Offline Play CDN / Fallback) -->
+    <title>Hotel RAKS - Management & Night Audit Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
+        body { font-family: 'Inter', sans-serif; }
         @media print {
-            body { background-color: white; }
+            body { background: white !important; }
             .no-print { display: none !important; }
-            .print-border { border: 1px solid #000 !important; }
             input, select { border: none !important; background: transparent !important; padding: 0 !important; }
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-slate-100 text-slate-800 h-full antialiased flex flex-col justify-between">
 
-    <!-- Top Toolbar (No Print) -->
-    <header class="bg-slate-900 text-white shadow-md no-print py-2 px-4 sticky top-0 z-50 flex flex-wrap justify-between items-center gap-4 border-b border-slate-700">
-        <div class="flex items-center space-x-3">
-            <div class="bg-amber-600 text-white font-bold h-9 w-9 rounded-full flex items-center justify-center text-base border-2 border-amber-400">R</div>
-            <div>
-                <h1 class="font-bold text-sm tracking-wider">Cater-Pillar FO (HOTEL RAKS)</h1>
-                <p class="text-[10px] text-slate-400">G.S.T Enabled Front Office System</p>
+    <!-- Global Suite Header / Master Navigation -->
+    <header class="bg-slate-900 text-white shadow-md no-print sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500 text-slate-950 p-2.5 rounded-xl font-bold text-lg shadow">
+                    <i class="fa-solid fa-hotel"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight">Hotel RAKS &bull; Management Suite</h1>
+                    <p class="text-xs text-slate-400">Integrated Front Office & Night Audit Closing Report</p>
+                </div>
             </div>
-        </div>
 
-        <div class="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-300">
-            <span class="hover:text-white cursor-pointer">Info</span>
-            <span class="hover:text-white cursor-pointer">Reservation</span>
-            <span onclick="switchView('checkin')" class="hover:text-white cursor-pointer text-amber-400">Check-In/Out</span>
-            <span onclick="switchView('fcr')" class="hover:text-white cursor-pointer">F.C.R. Billing</span>
-            <span onclick="switchView('advance')" class="hover:text-white cursor-pointer">Advance Receipts</span>
-            <span onclick="switchView('summary')" class="hover:text-white cursor-pointer">Daily Summary</span>
-            <span class="text-rose-400 cursor-pointer">Exit</span>
-        </div>
-
-        <div class="flex items-center gap-2">
-            <button onclick="saveReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-medium transition shadow"><i class="fa-solid fa-floppy-disk mr-1"></i> Save</button>
-            <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded text-xs font-medium transition shadow"><i class="fa-solid fa-print mr-1"></i> Print</button>
+            <!-- Master Program Switcher Buttons -->
+            <div class="flex items-center gap-3">
+                <button onclick="switchProgram('audit')" id="btnAppAudit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold transition shadow flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Night Audit & Closing Report
+                </button>
+                <button onclick="switchProgram('frontoffice')" id="btnAppFo" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold transition border border-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-desktop"></i> Front Office & FCR Suite
+                </button>
+            </div>
         </div>
     </header>
 
-    <div class="flex flex-grow">
-        <!-- Sidebar Navigation -->
-        <aside class="w-48 bg-slate-800 text-white flex flex-col no-print border-r border-slate-700 shrink-0">
-            <div class="p-3 bg-slate-900 text-center font-bold text-xs uppercase text-amber-400 tracking-widest border-b border-slate-700">
-                Quick Menu
-            </div>
-            <div class="flex flex-col divide-y divide-slate-700/50 text-xs font-medium">
-                <button onclick="sidebarAction('Login')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-user-lock w-5 text-amber-400"></i> F2 Login</button>
-                <button onclick="switchView('checkin')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-calendar-days w-5 text-blue-400"></i> F3 Avail / Rooms</button>
-                <button onclick="sidebarAction('Reservation')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-address-book w-5 text-emerald-400"></i> F4 Reservation</button>
-                <button onclick="switchView('checkin')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-key w-5 text-purple-400"></i> F5 Check-In</button>
-                <button onclick="openCheckInModal('408')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-bolt w-5 text-yellow-400"></i> F6 Qck Checkin</button>
-                <button onclick="switchView('fcr')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-file-invoice-dollar w-5 text-cyan-400"></i> F7 Bill / FCR</button>
-                <button onclick="switchView('advance')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-receipt w-5 text-pink-400"></i> F8 Advance Rec.</button>
-                <button onclick="sidebarAction('Occupancy')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-chart-bar w-5 text-orange-400"></i> F9 Occupancy</button>
-                <button onclick="switchView('summary')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-chart-pie w-5 text-emerald-400"></i> F10 Summary</button>
-                <button onclick="sidebarAction('Alerts')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-bell w-5 text-rose-400"></i> F11 Alerts</button>
-                <button onclick="sidebarAction('Address')" class="p-3 text-left hover:bg-slate-700 transition flex items-center gap-3"><i class="fa-solid fa-address-card w-5 text-indigo-400"></i> F12 Address</button>
-            </div>
-        </aside>
+    <!-- ================= PROGRAM 1: NIGHT AUDIT & CLOSING REPORT ================= -->
+    <div id="appContainerAudit" class="w-full flex-grow">
+        <main class="max-w-7xl mx-auto px-4 py-6 w-full space-y-6">
 
-        <!-- Main Content Area -->
-        <main class="flex-grow p-4 md:p-6 overflow-x-auto">
-            
-            <!-- ================= VIEW 1: CHECK-IN & ROOM AVAILABILITY ================= -->
-            <div id="viewCheckin" class="space-y-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-hotel text-blue-600"></i> Room Availability & Check-In Dashboard
-                        </h2>
-                        <p class="text-xs text-slate-500">Click any room to open check-in, update status or settle bills.</p>
-                    </div>
-                    <button onclick="openRoomTypeListModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow flex items-center gap-2 transition">
-                        <i class="fa-solid fa-table"></i> Room Type Wise Table View
-                    </button>
+            <!-- Report Meta Information Bar -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Date</span>
+                    <input type="text" id="reportDate" value="11.11.2026" class="mt-1 font-bold text-slate-800 bg-transparent w-full focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-1">
                 </div>
-
-                <!-- LIVE ROOM STATUS COUNTERS BAR -->
-                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 no-print">
-                    <div class="bg-slate-900 text-white p-3 rounded-xl shadow flex justify-between items-center">
-                        <span class="text-xs font-semibold uppercase">Total Rooms</span>
-                        <span id="counterTotal" class="font-mono font-black text-lg text-amber-400">46</span>
-                    </div>
-                    <div class="bg-rose-600 text-white p-3 rounded-xl shadow flex justify-between items-center">
-                        <span class="text-xs font-semibold uppercase">Occupied</span>
-                        <span id="counterOccupied" class="font-mono font-black text-lg">0</span>
-                    </div>
-                    <div class="bg-emerald-600 text-white p-3 rounded-xl shadow flex justify-between items-center">
-                        <span class="text-xs font-semibold uppercase">Vacant</span>
-                        <span id="counterVacant" class="font-mono font-black text-lg">0</span>
-                    </div>
-                    <div class="bg-blue-600 text-white p-3 rounded-xl shadow flex justify-between items-center">
-                        <span class="text-xs font-semibold uppercase">Blocked</span>
-                        <span id="counterBlocked" class="font-mono font-black text-lg">0</span>
-                    </div>
-                    <div class="bg-purple-600 text-white p-3 rounded-xl shadow flex justify-between items-center">
-                        <span class="text-xs font-semibold uppercase">Not Ready</span>
-                        <span id="counterNotReady" class="font-mono font-black text-lg">0</span>
-                    </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Shift</span>
+                    <input type="text" id="reportShift" value="NIGHT SHIFT" class="mt-1 font-bold text-slate-800 bg-transparent w-full focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-1 uppercase">
                 </div>
-
-                <div class="bg-white shadow-xl rounded-2xl p-6 border border-slate-200 space-y-8">
-                    <div>
-                        <h3 class="text-sm font-black text-slate-700 uppercase tracking-wider mb-3 border-b pb-1">1st Floor (101 - 109)</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3" id="floor1Grid"></div>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-black text-slate-700 uppercase tracking-wider mb-3 border-b pb-1">2nd Floor (201 - 217)</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3" id="floor2Grid"></div>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-black text-slate-700 uppercase tracking-wider mb-3 border-b pb-1">3rd Floor (302 - 313)</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3" id="floor3Grid"></div>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-black text-slate-700 uppercase tracking-wider mb-3 border-b pb-1">4th Floor (402 - 413)</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3" id="floor4Grid"></div>
-                    </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Staff Name</span>
+                    <input type="text" id="reportStaff" value="KANNA .N" class="mt-1 font-bold text-slate-800 bg-transparent w-full focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-1 uppercase">
+                </div>
+                <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                    <span class="block text-[11px] font-bold text-amber-800 uppercase tracking-wider">Opening Cash (FO Total)</span>
+                    <span id="metaOpeningDisplay" class="mt-1 font-extrabold text-amber-700 text-lg block">0</span>
                 </div>
             </div>
 
-            <!-- ================= VIEW 2: F.C.R. REPORT ================= -->
-            <div id="viewFcr" class="space-y-6 hidden">
-                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print">
-                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-table text-blue-600"></i> Front Office Cash Report (F.C.R.)
-                    </h2>
-                    <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> Add New Entry
-                    </button>
+            <!-- Master Summary Section -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-sky-900 text-white px-6 py-3.5 font-bold text-xs tracking-wider uppercase flex justify-between items-center">
+                    <span>Closing Report Summary Breakdown</span>
+                    <span class="text-[11px] bg-sky-800 px-3 py-1 rounded text-sky-200 font-medium">Live Calculation Engine</span>
                 </div>
-
-                <div class="bg-white shadow-2xl rounded-2xl p-6 sm:p-10 border border-slate-200 print-border">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-slate-900 pb-6 mb-6 gap-4">
-                        <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-full border-4 border-slate-900 flex items-center justify-center text-2xl font-black text-slate-900 bg-amber-50">R</div>
-                            <div>
-                                <h2 class="text-3xl font-black tracking-tight text-slate-900">Hotel RAKS</h2>
-                                <p class="text-sm font-bold text-amber-700 tracking-widest uppercase">Front Office Cash Report (F.C.R.)</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                    
+                    <!-- Column 1 -->
+                    <div class="p-5 space-y-5">
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b pb-2 mb-3">1. Base & Received Funds</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center bg-amber-50/60 p-2.5 rounded-lg border border-amber-100">
+                                    <span class="text-xs font-semibold text-slate-700">Opening Cash (From F.O.):</span>
+                                    <span id="summaryOpening" class="font-extrabold text-amber-700 text-base">0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-semibold text-slate-600">Total Received Amount:</span>
+                                    <span id="summaryReceivedTotal" class="font-bold text-sky-700">0</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="flex flex-wrap gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <div><label class="block text-xs font-semibold text-slate-500 uppercase">Bill No.</label><input type="text" id="headerBillNo" value="6478" class="font-bold text-slate-800 bg-transparent border-b border-slate-400 w-28 py-1"></div>
-                            <div><label class="block text-xs font-semibold text-slate-500 uppercase">Date</label><input type="date" id="headerDate" class="font-bold text-slate-800 bg-transparent border-b border-slate-400 py-1"></div>
+                        <div class="space-y-2 pt-2 border-t">
+                            <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                                <span>Received Items List</span>
+                            </div>
+                            <div id="receivedListContainer" class="space-y-1.5 max-h-36 overflow-y-auto pr-1"></div>
+                            <div class="flex gap-2 pt-1 no-print">
+                                <input type="text" id="newRecName" placeholder="Name / Source" class="text-xs border rounded-lg px-2.5 py-1.5 flex-grow bg-slate-50">
+                                <input type="number" id="newRecAmt" placeholder="Amt" class="text-xs border rounded-lg px-2.5 py-1.5 w-20 bg-slate-50">
+                                <button onclick="addReceivedItem()" class="bg-sky-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">Add</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto mb-8">
-                        <table class="w-full text-left border-collapse border border-slate-300 text-xs sm:text-sm">
-                            <thead>
-                                <tr class="bg-slate-900 text-white uppercase tracking-wider text-[11px]">
-                                    <th class="border border-slate-700 p-2 text-center w-10">Sl.</th>
-                                    <th class="border border-slate-700 p-2 text-center w-16">Room</th>
-                                    <th class="border border-slate-700 p-2 text-center w-20">C.R. No.</th>
-                                    <th class="border border-slate-700 p-2 text-center w-20">Bill No.</th>
-                                    <th class="border border-slate-700 p-2 w-44">Details</th>
-                                    <th class="border border-slate-700 p-2 w-40">Guest Name</th>
-                                    <th class="border border-slate-700 p-2 text-right bg-emerald-900 w-32">1. Cash (Rs.)</th>
-                                    <th class="border border-slate-700 p-2 text-right bg-blue-900 w-32">2. Digital / Card (Rs.)</th>
-                                    <th class="border border-slate-700 p-2 text-right bg-amber-900 w-32">3. Credit (Rs.)</th>
-                                    <th class="border border-slate-700 p-2 w-32">Payment Mode</th>
-                                    <th class="border border-slate-700 p-2 text-center w-24 no-print">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="fcrTableBody" class="divide-y divide-slate-200"></tbody>
-                            <tfoot>
-                                <tr class="bg-slate-100 font-bold text-sm">
-                                    <td colspan="6" class="border border-slate-300 p-3 text-right uppercase text-slate-700">CATEGORY TOTALS:</td>
-                                    <td id="totalCash" class="border border-slate-300 p-3 text-right text-emerald-700 font-mono bg-emerald-50">₹0.00</td>
-                                    <td id="totalDigital" class="border border-slate-300 p-3 text-right text-blue-700 font-mono bg-blue-50">₹0.00</td>
-                                    <td id="totalCredit" class="border border-slate-300 p-3 text-right text-amber-700 font-mono bg-amber-50">₹0.00</td>
-                                    <td colspan="2" class="border border-slate-300 p-3 bg-slate-200 text-center text-slate-900 font-bold" id="grandTotalLabel">Grand Total: ₹0.00</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= VIEW 3: ADVANCE RECEIPTS ================= -->
-            <div id="viewAdvance" class="space-y-6 hidden">
-                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print">
-                    <h2 class="text-xl font-bold text-purple-900 flex items-center gap-2">
-                        <i class="fa-solid fa-receipt text-purple-600"></i> Advance Cash Receipts Register
-                    </h2>
-                    <button onclick="openAdvanceModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> New Advance Receipt
-                    </button>
-                </div>
-
-                <div class="bg-white shadow-2xl rounded-2xl p-6 sm:p-10 border border-slate-200 print-border">
-                    <div class="overflow-x-auto mb-8">
-                        <table class="w-full text-left border-collapse border border-slate-300 text-xs sm:text-sm">
-                            <thead>
-                                <tr class="bg-purple-900 text-white uppercase tracking-wider text-[11px]">
-                                    <th class="border border-purple-700 p-2 text-center w-10">Sl.</th>
-                                    <th class="border border-purple-700 p-2 text-center w-24">Receipt No.</th>
-                                    <th class="border border-purple-700 p-2 text-center w-28">Date</th>
-                                    <th class="border border-purple-700 p-2 text-center w-24">GR No.</th>
-                                    <th class="border border-purple-700 p-2 w-48">Guest Name</th>
-                                    <th class="border border-purple-700 p-2 text-right w-32">Amount (₹)</th>
-                                    <th class="border border-purple-700 p-2 w-32">Mode</th>
-                                    <th class="border border-purple-700 p-2 w-64">Purpose / Booking Details</th>
-                                    <th class="border border-purple-700 p-2 text-center w-24 no-print">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="advanceTableBody" class="divide-y divide-slate-200"></tbody>
-                            <tfoot>
-                                <tr class="bg-purple-50 font-bold text-sm">
-                                    <td colspan="5" class="border border-slate-300 p-3 text-right uppercase text-purple-900">Total Advance Collected:</td>
-                                    <td id="totalAdvanceAmount" class="border border-slate-300 p-3 text-right text-purple-700 font-mono">₹0.00</td>
-                                    <td colspan="3" class="border border-slate-300 p-3"></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= VIEW 4: DAILY SALES SUMMARY ================= -->
-            <div id="viewSummary" class="space-y-6 hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print gap-4">
-                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-pie text-amber-600"></i> Daily Sales Summary (Page 3)
-                    </h2>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <button onclick="saveReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow flex items-center gap-2">
-                            <i class="fa-solid fa-floppy-disk"></i> Save Summary
-                        </button>
-                        <button onclick="resetSummary()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow flex items-center gap-2">
-                            <i class="fa-solid fa-rotate-right"></i> Reset Summary
-                        </button>
-                        <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow flex items-center gap-2">
-                            <i class="fa-solid fa-print"></i> Print / PDF
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-white shadow-2xl rounded-2xl p-6 sm:p-10 border border-slate-200 print-border max-w-4xl mx-auto">
-                    <div class="border-b-2 border-slate-900 pb-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <!-- Column 2 -->
+                    <div class="p-5 space-y-5">
                         <div>
-                            <h2 class="text-2xl font-black text-slate-900">HOTEL RAKS - DAILY SALES SUMMARY</h2>
-                            <p class="text-xs text-slate-500">Comprehensive Departmental Revenue Report</p>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b pb-2 mb-3">2. Department Collections</h3>
+                            <div class="space-y-2.5 text-xs">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-slate-600">Restaurant:</span>
+                                    <span id="sumRestTotal" class="font-bold text-slate-800">0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-slate-600">Bar:</span>
+                                    <span id="sumBarTotal" class="font-bold text-slate-800">0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-slate-600">BQT (Bank Out):</span>
+                                    <span id="sumBqtTotal" class="font-bold text-slate-800">0</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2 bg-amber-100 p-2 rounded-lg border border-amber-300">
-                            <span class="text-xs font-bold text-slate-700 uppercase">DATE:</span>
-                            <input type="date" id="summaryDateInput" class="font-bold text-slate-900 bg-transparent focus:outline-none text-sm">
+                        <div class="space-y-2 pt-3 border-t">
+                            <div class="flex justify-between items-center text-xs font-bold text-rose-600">
+                                <span>Voucher Expenses (-)</span>
+                                <span id="voucherTotalDisplay">0</span>
+                            </div>
+                            <div id="voucherListContainer" class="space-y-1.5 max-h-28 overflow-y-auto pr-1"></div>
+                            <div class="flex gap-2 pt-1 no-print">
+                                <input type="text" id="newVoucherDesc" placeholder="Description" class="text-xs border rounded-lg px-2.5 py-1.5 flex-grow bg-slate-50">
+                                <input type="number" id="newVoucherAmt" placeholder="Amt" class="text-xs border rounded-lg px-2.5 py-1.5 w-20 bg-slate-50">
+                                <button onclick="addVoucherItem()" class="bg-rose-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">Add</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-900">
-                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                            <thead>
-                                <tr class="bg-orange-500 text-white font-bold text-center">
-                                    <th colspan="2" class="border border-slate-700 py-1.5 uppercase tracking-wider">ROOMS</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-300 font-medium">
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CASH</td><td id="sum_room_cash" class="border border-slate-300 px-3 py-1.5 text-right font-mono">0.00</td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5 text-rose-600">REFUND</td><td id="sum_room_refund" class="border border-slate-300 px-3 py-1.5 text-right font-mono">0.00</td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CARD</td><td id="sum_room_card" class="border border-slate-300 px-3 py-1.5 text-right font-mono">0.00</td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">UPI</td><td id="sum_room_upi" class="border border-slate-300 px-3 py-1.5 text-right font-mono">0.00</td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CREDIT - AGODA</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="input_agoda" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CREDIT - MMT</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="input_mmt" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CREDIT</td><td id="sum_room_credit" class="border border-slate-300 px-3 py-1.5 text-right font-mono">0.00</td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">ROOM ADVANCE CARD</td><td id="sum_adv_card" class="border border-slate-300 px-3 py-1.5 text-right font-mono">0.00</td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">ROOM ADVANCE UPI</td><td id="sum_adv_upi" class="border border-slate-300 px-3 py-1.5 text-right font-mono">0.00</td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">ROOM M/SWIPE</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="input_mswipe" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">ROOM ADVANCE CASH</td><td id="sum_adv_cash" class="border border-slate-300 px-3 py-1.5 text-right font-mono">0.00</td></tr>
-                                
-                                <tbody id="roomsExtraRows" class="divide-y divide-slate-300"></tbody>
-                                <tr>
-                                    <td colspan="2" class="border border-slate-300 px-3 py-1 bg-orange-50 no-print text-right">
-                                        <button onclick="addExtraRow('rooms')" class="text-xs bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 rounded font-semibold shadow"><i class="fa-solid fa-plus mr-1"></i> Add Custom Room Row</button>
-                                    </td>
-                                </tr>
-                                <tr class="bg-emerald-600 text-white font-bold"><td class="border border-slate-700 px-3 py-2">ROOMS TOTAL SALE</td><td id="sum_rooms_total" class="border border-slate-700 px-3 py-2 text-right font-mono bg-yellow-300 text-slate-900">0.00</td></tr>
-
-                                <!-- BANQUET SECTION -->
-                                <thead><tr class="bg-purple-600 text-white font-bold text-center"><th colspan="2" class="border border-slate-700 py-1.5 uppercase tracking-wider">BANQUET</th></tr></thead>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CASH</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bq_cash" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">UPI</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bq_upi" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">GPAY</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bq_gpay" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CREDIT</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bq_credit" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tbody id="banquetExtraRows" class="divide-y divide-slate-300"></tbody>
-                                <tr>
-                                    <td colspan="2" class="border border-slate-300 px-3 py-1 bg-purple-50 no-print text-right">
-                                        <button onclick="addExtraRow('banquet')" class="text-xs bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded font-semibold shadow"><i class="fa-solid fa-plus mr-1"></i> Add Custom Banquet Row</button>
-                                    </td>
-                                </tr>
-                                <tr class="bg-emerald-600 text-white font-bold"><td class="border border-slate-700 px-3 py-2">BANQUET TOTAL SALE</td><td id="sum_banquet_total" class="border border-slate-700 px-3 py-2 text-right font-mono bg-yellow-300 text-slate-900">0.00</td></tr>
-
-                                <!-- RESTAURANT SECTION -->
-                                <thead><tr class="bg-blue-600 text-white font-bold text-center"><th colspan="2" class="border border-slate-700 py-1.5 uppercase tracking-wider">RESTAURANT</th></tr></thead>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CASH</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="rest_cash" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5 text-rose-600">REFUND</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="rest_refund" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CARD</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="rest_card" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">UPI</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="rest_upi" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">GUEST A/C</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="rest_guest_ac" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">ROOM POST</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="rest_room_post" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">MAP PLAN</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="rest_map" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tbody id="restaurantExtraRows" class="divide-y divide-slate-300"></tbody>
-                                <tr>
-                                    <td colspan="2" class="border border-slate-300 px-3 py-1 bg-blue-50 no-print text-right">
-                                        <button onclick="addExtraRow('restaurant')" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded font-semibold shadow"><i class="fa-solid fa-plus mr-1"></i> Add Custom Restaurant Row</button>
-                                    </td>
-                                </tr>
-                                <tr class="bg-emerald-600 text-white font-bold"><td class="border border-slate-700 px-3 py-2">RESTAURANT TOTAL SALE</td><td id="sum_restaurant_total" class="border border-slate-700 px-3 py-2 text-right font-mono bg-yellow-300 text-slate-900">0.00</td></tr>
-
-                                <!-- BAR SECTION -->
-                                <thead><tr class="bg-amber-800 text-white font-bold text-center"><th colspan="2" class="border border-slate-700 py-1.5 uppercase tracking-wider">BAR</th></tr></thead>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CASH</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bar_cash" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5 text-rose-600">REFUND</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bar_refund" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CARD</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bar_card" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">UPI</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bar_upi" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">M/SWIPE</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bar_mswipe" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">ROOM POST</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bar_room_post" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tr><td class="border border-slate-300 px-3 py-1.5">CREDIT</td><td class="border border-slate-300 px-1 py-1"><input type="number" id="bar_credit" value="" placeholder="0.00" onkeydown="handleSummaryEnter(event)" oninput="calculateFinalSummary()" class="w-full text-right bg-transparent font-mono focus:outline-none"></td></tr>
-                                <tbody id="barExtraRows" class="divide-y divide-slate-300"></tbody>
-                                <tr>
-                                    <td colspan="2" class="border border-slate-300 px-3 py-1 bg-amber-50 no-print text-right">
-                                        <button onclick="addExtraRow('bar')" class="text-xs bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded font-semibold shadow"><i class="fa-solid fa-plus mr-1"></i> Add Custom Bar Row</button>
-                                    </td>
-                                </tr>
-                                <tr class="bg-emerald-600 text-white font-bold"><td class="border border-slate-700 px-3 py-2">BAR TOTAL SALE</td><td id="sum_bar_total" class="border border-slate-700 px-3 py-2 text-right font-mono bg-yellow-300 text-slate-900">0.00</td></tr>
-
-                                <!-- GRAND TOTAL -->
-                                <tr class="bg-slate-900 text-white font-black text-base">
-                                    <td class="border border-slate-700 px-3 py-3 uppercase">TOTAL SALES</td>
-                                    <td id="sum_grand_total" class="border border-slate-700 px-3 py-3 text-right font-mono text-cyan-300 text-lg">0.00</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <!-- Column 3 -->
+                    <div class="p-5 flex flex-col justify-between bg-slate-50/60">
+                        <div class="space-y-4">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b pb-2">3. Final Settlement</h3>
+                            <div class="space-y-3 text-xs">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-slate-600">Calculated Closing:</span>
+                                    <span id="finalCalculatedClosing" class="text-xl font-extrabold text-slate-900">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase text-slate-500">Audit Status:</span>
+                            <div class="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-2">
+                                <i class="fa-solid fa-circle-check"></i> CORRECT
+                            </div>
+                        </div>
                     </div>
+
+                </div>
+            </div>
+
+            <!-- Denominations -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-sky-800 text-white text-center py-2.5 text-xs font-bold uppercase">Front Office Cash</div>
+                    <div class="p-3.5 flex-grow"><table class="w-full text-xs"><tbody id="denom-foc" class="divide-y divide-slate-100"></tbody></table></div>
+                    <div class="bg-amber-300 p-3 flex justify-between font-bold text-xs"><span>TOTAL</span><span id="total-foc">0</span></div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-sky-800 text-white text-center py-2.5 text-xs font-bold uppercase">Restaurant</div>
+                    <div class="p-3.5 flex-grow"><table class="w-full text-xs"><tbody id="denom-rest" class="divide-y divide-slate-100"></tbody></table></div>
+                    <div class="bg-amber-300 p-3 flex justify-between font-bold text-xs"><span>TOTAL</span><span id="total-rest">0</span></div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-sky-800 text-white text-center py-2.5 text-xs font-bold uppercase">Bar</div>
+                    <div class="p-3.5 flex-grow"><table class="w-full text-xs"><tbody id="denom-bar" class="divide-y divide-slate-100"></tbody></table></div>
+                    <div class="bg-amber-300 p-3 flex justify-between font-bold text-xs"><span>TOTAL</span><span id="total-bar">0</span></div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-sky-800 text-white text-center py-2.5 text-xs font-bold uppercase">BQT / Bank Out</div>
+                    <div class="p-3.5 flex-grow"><table class="w-full text-xs"><tbody id="denom-bqt" class="divide-y divide-slate-100"></tbody></table></div>
+                    <div class="bg-amber-300 p-3 flex justify-between font-bold text-xs"><span>TOTAL</span><span id="total-bqt">0</span></div>
+                </div>
+            </div>
+
+            <!-- Advance Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-900 text-white px-6 py-3.5 font-bold text-xs uppercase flex justify-between items-center">
+                    <span>Advance Bookings & Reservations</span>
+                    <button onclick="addAdvanceRow()" class="bg-sky-600 text-white text-xs px-3 py-1 rounded">Add Row</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-slate-50 text-slate-500 border-b">
+                            <tr>
+                                <th class="px-4 py-3 w-20">R. No</th>
+                                <th class="px-4 py-3 min-w-[280px]">Name (Unclipped)</th>
+                                <th class="px-4 py-3 text-center w-28">Persons</th>
+                                <th class="px-4 py-3 w-36">Adv / Amount</th>
+                                <th class="px-4 py-3 w-32">Date</th>
+                                <th class="px-4 py-3 w-28">Bill No</th>
+                                <th class="px-4 py-3 text-center w-20 no-print">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditAdvanceTableBody" class="divide-y divide-slate-200"></tbody>
+                    </table>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <!-- ================= ROOM TYPE WISE TABLE VIEW MODAL ================= -->
-    <div id="roomTypeListModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2">
-        <div class="bg-white rounded-2xl max-w-5xl w-full p-4 shadow-2xl border border-slate-200 my-auto flex flex-col justify-between max-h-[95vh]">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 border-b pb-2 gap-2">
-                <div>
-                    <h3 class="font-black text-base text-slate-900"><i class="fa-solid fa-table text-indigo-600 mr-2"></i> Room Type Wise Table View (Hotel RAKS)</h3>
-                    <p class="text-[10px] text-slate-500">Click any room cell below to open Check-In or Status Update directly.</p>
+    <!-- ================= PROGRAM 2: FRONT OFFICE SUITE ================= -->
+    <div id="appContainerFo" class="w-full flex-grow hidden">
+        <div class="flex flex-grow">
+            <aside class="w-48 bg-slate-800 text-white flex flex-col no-print border-r border-slate-700 shrink-0">
+                <div class="p-3 bg-slate-900 text-center font-bold text-xs uppercase text-amber-400 border-b border-slate-700">Quick Menu</div>
+                <div class="flex flex-col divide-y divide-slate-700/50 text-xs font-medium">
+                    <button onclick="switchFoView('checkin')" class="p-3 text-left hover:bg-slate-700 flex items-center gap-3"><i class="fa-solid fa-key w-5 text-purple-400"></i> Rooms / Check-In</button>
+                    <button onclick="switchFoView('fcr')" class="p-3 text-left hover:bg-slate-700 flex items-center gap-3"><i class="fa-solid fa-file-invoice-dollar w-5 text-cyan-400"></i> F7 Bill / FCR</button>
+                    <button onclick="switchFoView('advance')" class="p-3 text-left hover:bg-slate-700 flex items-center gap-3"><i class="fa-solid fa-receipt w-5 text-pink-400"></i> F8 Advance Rec.</button>
                 </div>
-                
-                <!-- NEW UPLOAD ROOM LIST IMAGE BUTTON -->
-                <div class="flex items-center gap-2 bg-indigo-50 p-1.5 rounded-xl border border-indigo-200">
-                    <label for="roomListImageUpload" class="cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Room List Image
-                    </label>
-                    <input type="file" id="roomListImageUpload" accept="image/*" class="hidden" onchange="handleRoomListUpload(event)">
-                    <span id="uploadedFileName" class="text-[10px] text-indigo-900 font-semibold truncate max-w-[120px]">No file chosen</span>
-                </div>
-
-                <button onclick="closeRoomTypeListModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-2 py-1 bg-slate-100 rounded-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse border border-slate-300 text-[11px]">
-                    <thead>
-                        <tr class="bg-slate-900 text-white text-center font-bold uppercase tracking-wider text-[10px]">
-                            <th class="border border-slate-700 p-1.5 w-1/4" id="headerTitlePremium">PREMIUM</th>
-                            <th class="border border-slate-700 p-1.5 w-1/4" id="headerTitleFamily">FAMILY</th>
-                            <th class="border border-slate-700 p-1.5 w-1/4" id="headerTitleSuperior">SUPERIOR</th>
-                            <th class="border border-slate-700 p-1.5 w-1/4" id="headerTitleSuite">SUITE</th>
-                        </tr>
-                    </thead>
-                    <tbody id="roomTypeTableBody" class="divide-y divide-slate-200 font-medium"></tbody>
-                    <tfoot>
-                        <tr class="bg-slate-900 text-white font-black text-center text-xs">
-                            <td class="border border-slate-700 p-1.5" id="totalCountPremium">25 Rooms</td>
-                            <td class="border border-slate-700 p-1.5" id="totalCountFamily">10 Rooms</td>
-                            <td class="border border-slate-700 p-1.5" id="totalCountSuperior">8 Rooms</td>
-                            <td class="border border-slate-700 p-1.5" id="totalCountSuite">3 Rooms</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <div class="flex justify-end pt-2 border-t mt-2">
-                <button type="button" onclick="closeRoomTypeListModal()" class="px-4 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-bold shadow">Close Window</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= CHECK-IN / CHECK-OUT MODAL ================= -->
-    <div id="checkinModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2">
-        <div class="bg-white rounded-2xl max-w-5xl w-full p-4 shadow-2xl border border-slate-200 my-auto max-h-[98vh] flex flex-col justify-between">
-            
-            <div class="flex justify-between items-center mb-3 border-b pb-2 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-3 rounded-xl shadow">
-                <div class="flex items-center gap-4">
-                    <div class="bg-amber-500 text-slate-950 font-black px-4 py-2 rounded-xl text-2xl shadow-inner border-2 border-amber-300 font-mono tracking-wider" id="modalRoomNoDisplay">ROOM #408</div>
-                    <div>
-                        <div class="text-[10px] tracking-widest text-amber-300 font-bold uppercase" id="modalCategoryBadge">PREMIUM ROOM</div>
-                        <h3 class="font-black text-base md:text-lg text-white uppercase tracking-wide" id="modalHeaderTitle">Guest Check-In & Tariff Settlement</h3>
-                        <p class="text-[11px] text-slate-300 font-medium">GR #<span id="headerGrDisplay">3</span> | Date: <span id="headerDateDisplay">07/10/2026</span></p>
+            </aside>
+            <main class="flex-grow p-4 md:p-6 overflow-x-auto">
+                <div id="viewCheckin" class="space-y-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-slate-900">Room Availability & Check-In Dashboard</h2>
                     </div>
-                </div>
-                <button onclick="closeCheckInModal()" class="text-slate-300 hover:text-white text-xl font-bold p-2 bg-white/10 rounded-lg hover:bg-white/25 transition"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <form onsubmit="handleCheckInSubmit(event)" class="space-y-3 text-xs overflow-y-auto pr-1">
-                <input type="hidden" id="checkinRoomNo">
-                
-                <!-- AADHAR CARD AUTO-FILL BOX -->
-                <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 flex flex-col sm:flex-row justify-between items-center gap-2">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-id-card text-purple-700 text-lg"></i>
+                    <div class="bg-white shadow-xl rounded-2xl p-6 border space-y-8">
                         <div>
-                            <span class="font-bold text-purple-900 block text-xs">ID Proof / Aadhar Auto-Fill</span>
-                            <span class="text-[10px] text-slate-500">Upload image to auto-populate guest details</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input type="file" id="aadharUploadInput" accept="image/*" onchange="simulateAadharOCR(event)" class="text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-700 file:text-white hover:file:bg-purple-800 cursor-pointer">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-                    <div><label class="block font-semibold text-slate-700 mb-0.5">Check-In Dt + Time</label><input type="datetime-local" id="checkinTime" class="w-full p-1 border rounded bg-white font-semibold"></div>
-                    <div><label class="block font-semibold text-slate-700 mb-0.5">Check-Out Dt + Time</label><input type="datetime-local" id="checkoutTime" class="w-full p-1 border rounded bg-white font-semibold"></div>
-                    <div><label class="block font-semibold text-slate-700 mb-0.5">Manual GR #</label><input type="text" id="manualGr" value="0" class="w-full p-1 border rounded bg-white font-semibold"></div>
-                    <div><label class="block font-semibold text-slate-700 mb-0.5">Days</label><input type="text" id="regDays" value="1" readonly class="w-full p-1 border rounded bg-slate-100 font-semibold text-center"></div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                    <div class="md:col-span-3 space-y-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex flex-col items-center">
-                        <div id="guestPhotoContainer" class="w-24 h-28 bg-slate-200 border-2 border-slate-300 rounded flex flex-col items-center justify-center text-slate-400 overflow-hidden">
-                            <i class="fa-solid fa-user text-3xl mb-1"></i>
-                            <span class="text-[9px]">Guest Photo</span>
-                        </div>
-                        <button type="button" class="w-full bg-slate-800 text-white py-1 rounded text-[10px] font-semibold">Start Camera</button>
-                    </div>
-
-                    <div class="md:col-span-5 space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                        <div class="grid grid-cols-4 gap-2 items-center"><label class="font-semibold text-slate-700 col-span-1">Guest Name</label><input type="text" id="regGuestName" required class="w-full p-1 border rounded bg-white font-medium col-span-2"><input type="text" id="regGuestAge" placeholder="Age" class="w-full p-1 border rounded bg-white text-center"></div>
-                        <div class="grid grid-cols-4 gap-2 items-center"><label class="font-semibold text-slate-700 col-span-1">Sharer</label><input type="text" id="regSharer" class="w-full p-1 border rounded bg-white col-span-2"><input type="text" id="regSharerAge" placeholder="Age" class="w-full p-1 border rounded bg-white text-center"></div>
-                        <div class="grid grid-cols-3 gap-2 items-center"><label class="font-semibold text-slate-700 col-span-1">Company</label><input type="text" id="regCompany" class="w-full p-1 border rounded bg-white col-span-2"></div>
-                        <div class="grid grid-cols-3 gap-2 items-center"><label class="font-semibold text-slate-700 col-span-1">Street</label><input type="text" id="regStreet" class="w-full p-1 border rounded bg-white col-span-2"></div>
-                        <div class="grid grid-cols-3 gap-2 items-center"><label class="font-semibold text-slate-700 col-span-1">Area</label><input type="text" id="regArea" class="w-full p-1 border rounded bg-white col-span-2"></div>
-                        <div class="grid grid-cols-3 gap-2 items-center"><label class="font-semibold text-slate-700 col-span-1">City</label><input type="text" id="regCity" class="w-full p-1 border rounded bg-white col-span-2"></div>
-                        <div class="grid grid-cols-3 gap-2 items-center"><label class="font-semibold text-slate-700 col-span-1">Phone</label><input type="text" id="regPhone" class="w-full p-1 border rounded bg-white col-span-2"></div>
-                    </div>
-
-                    <div class="md:col-span-4 space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                        <div class="grid grid-cols-2 gap-2">
-                            <div><label class="text-[10px] font-semibold text-slate-500">Room Category</label><input type="text" id="regRoomType" readonly class="w-full p-1 border rounded bg-slate-100 font-bold uppercase text-purple-900"></div>
-                            <div>
-                                <label class="text-[10px] font-semibold text-slate-500">Tariff Rate (₹)</label>
-                                <input type="number" id="regTariffRateInput" oninput="calculateBillDetails()" class="w-full p-1 border rounded bg-white font-bold text-blue-800 font-mono text-xs">
-                            </div>
-                        </div>
-
-                        <div class="bg-indigo-50 p-2 rounded-lg border border-indigo-200 space-y-1">
-                            <label class="block text-[10px] font-bold text-indigo-900 uppercase">Tariff Plan & Occupancy</label>
-                            <select id="regTariffPlanSelect" onchange="onTariffPlanChange()" class="w-full p-1 border rounded bg-white font-bold text-indigo-900 text-xs"></select>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 bg-amber-100 p-1.5 rounded-lg border border-amber-300">
-                            <div>
-                                <label class="text-[10px] font-bold text-amber-900 uppercase">Discount Option</label>
-                                <select id="regDiscountPercent" onchange="calculateBillDetails()" class="w-full p-1 border rounded bg-white font-bold text-rose-700 text-xs">
-                                    <option value="0">0% (No Discount)</option>
-                                    <option value="5">5% Discount</option>
-                                    <option value="8">8% Discount</option>
-                                    <option value="10">10% Discount</option>
-                                    <option value="12">12% Discount</option>
-                                    <option value="15">15% Discount</option>
-                                    <option value="18">18% Discount</option>
-                                    <option value="20">20% Discount</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-amber-900 uppercase">Discount Amt (₹)</label>
-                                <input type="text" id="boxDiscountAmt" value="₹0.00" readonly class="w-full p-1 border rounded bg-slate-100 font-mono font-bold text-rose-600 text-right">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-1">
-                            <div><label class="text-[10px] font-semibold text-slate-500">Guest ID</label><input type="text" id="regGuestId" class="w-full p-1 border rounded bg-white"></div>
-                            <div><label class="text-[10px] font-semibold text-slate-500">Adult</label><input type="number" id="regPaxAdult" value="1" class="w-full p-1 border rounded bg-white text-center"></div>
-                            <div><label class="text-[10px] font-semibold text-slate-500">Child</label><input type="number" id="regChild" value="0" class="w-full p-1 border rounded bg-white text-center"></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-[10px] font-semibold text-slate-500">Payment Mode</label>
-                                <select id="regPaymentBy" class="w-full p-1 border rounded bg-white font-bold text-emerald-700">
-                                    <option value="Cash">Cash</option>
-                                    <option value="Card">Card</option>
-                                    <option value="UPI">UPI</option>
-                                    <option value="Credit">Credit</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-semibold text-slate-500">Payment Amt (₹)</label>
-                                <input type="number" step="0.01" id="regPaymentAmount" value="0" class="w-full p-1 border rounded bg-white font-mono font-bold text-purple-700" placeholder="0.00">
-                            </div>
+                            <h3 class="text-sm font-black text-slate-700 uppercase mb-3 border-b pb-1">All Rooms (101 - 413)</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3" id="floor1Grid"></div>
                         </div>
                     </div>
                 </div>
-
-                <div class="bg-blue-50 p-2.5 rounded-lg border border-blue-200 grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs">
-                    <div><span class="block text-[9px] text-slate-500">Base Tariff</span><span id="boxRackRate" class="font-mono font-bold">₹2,500.00</span></div>
-                    <div><span class="block text-[9px] text-slate-500">Discount %</span><span id="boxDiscDisplay" class="font-bold text-rose-600">0%</span></div>
-                    <div><span class="block text-[9px] text-slate-500">GST (5%)</span><span id="boxTaxAmt" class="font-mono font-bold">₹125.00</span></div>
-                    <div class="col-span-2 bg-blue-100 p-1 rounded border border-blue-300"><span class="block text-[9px] font-bold text-blue-900 uppercase">Final Nett Payable</span><span id="boxNettRate" class="font-mono font-black text-blue-900 text-sm">₹2,625.00</span></div>
-                </div>
-
-                <div class="flex justify-between items-center pt-2 border-t">
-                    <button type="button" id="checkoutBtn" onclick="handleCheckOut()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-bold shadow flex items-center gap-1.5 hidden"><i class="fa-solid fa-right-from-bracket"></i> Check-Out</button>
-                    <div class="flex gap-2 ml-auto">
-                        <button type="button" onclick="closeCheckInModal()" class="px-3 py-1.5 border rounded-lg text-slate-600 hover:bg-slate-100 font-semibold">Cancel</button>
-                        <button type="button" onclick="enableEditMode()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold shadow flex items-center gap-1"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                        <button type="button" onclick="handleCheckInPaymentSave()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold shadow flex items-center gap-1"><i class="fa-solid fa-credit-card"></i> Pay to FCR</button>
-                        <button type="submit" id="submitCheckinBtn" class="px-5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow flex items-center gap-1.5"><i class="fa-solid fa-check"></i> Save & Check-In</button>
+                <div id="viewFcr" class="space-y-6 hidden">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center">
+                        <h2 class="text-xl font-bold">Front Office Cash Report (F.C.R.)</h2>
+                        <button onclick="openAddModal()" class="bg-emerald-600 text-white px-4 py-2 rounded text-sm">Add Entry</button>
+                    </div>
+                    <div class="bg-white shadow-xl rounded-2xl p-6 border">
+                        <table class="w-full text-left border-collapse border text-xs">
+                            <thead>
+                                <tr class="bg-slate-900 text-white">
+                                    <th class="border p-2">Room</th>
+                                    <th class="border p-2">Guest Name</th>
+                                    <th class="border p-2 text-right">Cash</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fcrTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
-            </form>
+                <div id="viewAdvance" class="space-y-6 hidden">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center">
+                        <h2 class="text-xl font-bold">Advance Cash Receipts</h2>
+                        <button onclick="openAdvanceModal()" class="bg-purple-600 text-white px-4 py-2 rounded text-sm">New Advance</button>
+                    </div>
+                    <div class="bg-white shadow-xl rounded-2xl p-6 border">
+                        <table class="w-full text-left border-collapse border text-xs">
+                            <thead>
+                                <tr class="bg-purple-900 text-white">
+                                    <th class="border p-2">Receipt No</th>
+                                    <th class="border p-2">Guest Name</th>
+                                    <th class="border p-2 text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="foAdvanceTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 
-    <!-- ================= CHECK-OUT BALANCE & BILL SETTLEMENT MODAL ================= -->
-    <div id="checkoutModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-lg text-slate-900"><i class="fa-solid fa-file-invoice-dollar text-rose-600 mr-2"></i>Check-Out & Balance Settlement</h3>
-                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <input type="hidden" id="checkoutRoomNo">
-            <div class="space-y-3 text-xs bg-slate-50 p-4 rounded-xl border">
-                <div class="flex justify-between"><span class="font-semibold text-slate-600">Guest Name:</span><span id="coGuestName" class="font-bold text-slate-900"></span></div>
-                <div class="flex justify-between"><span class="font-semibold text-slate-600">Total Bill Amount:</span><span id="coTotalBill" class="font-mono font-bold text-blue-800">₹0.00</span></div>
-                <div class="flex justify-between"><span class="font-semibold text-slate-600">Already Paid / Advance:</span><span id="coPaidAmt" class="font-mono font-bold text-emerald-700">₹0.00</span></div>
-                <div class="flex justify-between border-t pt-2 text-sm"><span class="font-bold text-rose-700 uppercase">Balance Due to Pay:</span><span id="coBalanceDue" class="font-mono font-black text-rose-700 text-base">₹0.00</span></div>
-            </div>
-
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Settlement Payment Mode</label>
-                    <select id="coPaymentMode" class="w-full p-2 border rounded-lg text-sm bg-white font-medium">
-                        <option value="Cash">Cash</option>
-                        <option value="Card">Card</option>
-                        <option value="UPI">UPI</option>
-                        <option value="Credit">Credit</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Amount to Pay Now (₹)</label>
-                    <input type="number" step="0.01" id="coPayAmount" class="w-full p-2 border rounded-lg text-sm font-mono font-bold text-emerald-700" placeholder="0.00">
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-3 pt-4 border-t">
-                <button type="button" onclick="closeCheckoutModal()" class="px-4 py-2 border rounded-lg text-sm text-slate-600">Cancel</button>
-                <button type="button" onclick="confirmFullCheckoutAndPrint()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow flex items-center gap-2"><i class="fa-solid fa-print"></i> Pay & Final Check-Out</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= FULL BILL PRINT PREVIEW MODAL ================= -->
-    <div id="printBillModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-xl max-w-xl w-full p-8 shadow-2xl border space-y-6 text-slate-800 my-8">
-            <div class="text-center border-b pb-4">
-                <h2 class="text-2xl font-black tracking-wider text-slate-900">HOTEL RAKS</h2>
-                <p class="text-xs text-slate-500">No: 8 & 9, Kalanchiyam Garden, Near New Bus Stand, THANJAVUR.</p>
-                <p class="text-xs text-slate-500">Ph: 04362 - 226806 | Cell: 7373733014</p>
-                <h3 class="text-sm font-bold uppercase tracking-widest bg-slate-900 text-white py-1 mt-3 rounded">Final Guest Settlement Bill</h3>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-lg border">
-                <div><p><strong class="text-slate-600">Bill No:</strong> <span id="printBillNo">BL-1001</span></p><p><strong class="text-slate-600">GR No:</strong> <span id="printGrNo">3</span></p><p><strong class="text-slate-600">Guest Name:</strong> <span id="printGuestName">PARIVEL</span></p></div>
-                <div class="text-right"><p><strong class="text-slate-600">Room No:</strong> <span id="printRoomNo">408</span></p><p><strong class="text-slate-600">Date:</strong> <span id="printDate">09-10-2026</span></p><p><strong class="text-slate-600">Category:</strong> <span id="printCategory">PREMIUM</span></p></div>
-            </div>
-
-            <table class="w-full text-xs border-collapse border border-slate-300">
-                <thead>
-                    <tr class="bg-slate-200 text-slate-900 font-bold">
-                        <th class="border border-slate-300 p-2 text-left">Description</th>
-                        <th class="border border-slate-300 p-2 text-right">Amount (₹)</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-200">
-                    <tr><td class="border border-slate-300 p-2">Room Rent / Tariff Charges</td><td id="printTariffRate" class="border border-slate-300 p-2 text-right font-mono">2,500.00</td></tr>
-                    <tr><td class="border border-slate-300 p-2">Discount Applied</td><td id="printDiscAmt" class="border border-slate-300 p-2 text-right font-mono text-rose-600">0.00</td></tr>
-                    <tr><td class="border border-slate-300 p-2">GST (5.0%)</td><td id="printTaxAmt" class="border border-slate-300 p-2 text-right font-mono">125.00</td></tr>
-                </tbody>
-                <tfoot>
-                    <tr class="font-bold bg-slate-50">
-                        <td class="border border-slate-300 p-2 text-right">Total Bill:</td>
-                        <td id="printTotalBill" class="border border-slate-300 p-2 text-right font-mono">₹2,625.00</td>
-                    </tr>
-                    <tr class="font-bold bg-emerald-50 text-emerald-800">
-                        <td class="border border-slate-300 p-2 text-right">Paid / Settled Amount:</td>
-                        <td id="printPaidAmt" class="border border-slate-300 p-2 text-right font-mono">₹2,625.00</td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <div class="grid grid-cols-2 gap-8 pt-8 border-t text-center text-xs">
-                <div><p class="font-bold border-t border-slate-400 pt-1">F.O. Signature</p></div>
-                <div><p class="font-bold border-t border-slate-400 pt-1">Guest Signature</p></div>
-            </div>
-
-            <div class="flex justify-between items-center pt-4 border-t no-print">
-                <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-bold text-xs shadow"><i class="fa-solid fa-print mr-1"></i> Print Bill</button>
-                <button onclick="finishCheckoutProcess()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold text-xs shadow">Done & Complete Checkout</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Status Change Modal -->
-    <div id="statusModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center space-y-4">
-            <input type="hidden" id="statusRoomNo">
-            <h3 class="font-bold text-lg text-slate-900" id="statusModalTitle">Room Status Update</h3>
-            <p class="text-xs text-slate-500">Change room status to Vacant (Available) or Blocked:</p>
-            <div class="flex flex-col gap-2">
-                <button onclick="updateRoomStatus('vacant')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg text-sm shadow">Mark as Vacant (Available)</button>
-                <button onclick="updateRoomStatus('blocked')" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 rounded-lg text-sm shadow">Mark as Blocked</button>
-                <button onclick="closeStatusModal()" class="w-full border py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modals for FCR -->
+    <!-- Modals -->
     <div id="addModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
-            <div class="flex justify-between items-center mb-4 border-b pb-3">
-                <h3 id="modalTitle" class="font-bold text-lg text-slate-900"><i class="fa-solid fa-file-circle-plus text-emerald-600 mr-2"></i>Add New Transaction Entry</h3>
-                <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <h3 class="font-bold text-lg mb-4">Add FCR Entry</h3>
             <form onsubmit="handleModalSubmit(event)" class="space-y-4">
-                <input type="hidden" id="editIndex" value="-1">
-                <div class="grid grid-cols-3 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Room No.</label><input type="text" id="modalRoom" required class="w-full p-2 border rounded-lg text-sm"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">C.R. No.</label><input type="text" id="modalCr" class="w-full p-2 border rounded-lg text-sm"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Bill No.</label><input type="text" id="modalBill" required class="w-full p-2 border rounded-lg text-sm"></div>
-                </div>
-                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Details</label><select id="modalDetails" required class="w-full p-2 border rounded-lg text-sm bg-white font-medium"><option value="Settlement">Settlement</option><option value="Already Advance Paid">Already Advance Paid</option><option value="Credit a/c">Credit a/c</option></select></div>
-                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Guest Name</label><input type="text" id="modalName" required class="w-full p-2 border rounded-lg text-sm" placeholder="Mr. / Ms. Name"></div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Payment Mode</label><select id="modalMode" class="w-full p-2 border rounded-lg text-sm bg-white font-medium"><option value="Cash">Cash (Col 1)</option><option value="Card">Card (Col 2)</option><option value="UPI">UPI (Col 2)</option><option value="Net Banking">Net Banking (Col 2)</option><option value="Bank Transfer">Bank Transfer (Col 2)</option><option value="Credit">Credit (Col 3)</option></select></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Amount (₹)</label><input type="number" step="0.01" id="modalAmount" required class="w-full p-2 border rounded-lg text-sm font-mono font-bold" placeholder="0.00"></div>
-                </div>
-                <div class="flex justify-end gap-3 pt-4 border-t"><button type="button" onclick="closeAddModal()" class="px-4 py-2 border rounded-lg text-sm text-slate-600">Cancel</button><button type="submit" id="modalSubmitBtn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium shadow">Add Entry</button></div>
+                <input type="text" id="modalRoom" placeholder="Room No" required class="w-full p-2 border rounded">
+                <input type="text" id="modalName" placeholder="Guest Name" required class="w-full p-2 border rounded">
+                <input type="number" id="modalAmount" placeholder="Amount" required class="w-full p-2 border rounded">
+                <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded">Save</button>
             </form>
         </div>
-    </div>
-
-    <!-- ADVANCE RECEIPT MODAL -->
-    <div id="advanceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
-            <div class="flex justify-between items-center mb-4 border-b pb-3">
-                <h3 id="advModalTitle" class="font-bold text-lg text-purple-900"><i class="fa-solid fa-receipt text-purple-600 mr-2"></i>New Advance Cash Receipt</h3>
-                <button onclick="closeAdvanceModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form onsubmit="handleAdvanceSubmit(event)" class="space-y-4">
-                <input type="hidden" id="editAdvIndex" value="-1">
-                <div class="grid grid-cols-3 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Receipt No.</label><input type="text" id="advReceiptNo" value="10301" required class="w-full p-2 border rounded-lg text-sm font-semibold"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Date</label><input type="date" id="advDate" required class="w-full p-2 border rounded-lg text-sm font-semibold"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">GR No.</label><input type="text" id="advGrInput" placeholder="Type GR #" oninput="searchByGrNumber(this.value)" class="w-full p-2 border rounded-lg text-sm font-bold bg-amber-50"></div>
-                </div>
-                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Guest Name</label><input type="text" id="advGuestName" required class="w-full p-2 border rounded-lg text-sm font-medium" placeholder="Auto-filled or type name"></div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Amount (Rs.)</label><input type="number" step="0.01" id="advAmount" required class="w-full p-2 border rounded-lg text-sm font-mono font-bold" placeholder="0.00"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Payment Mode</label><select id="advPaymentMode" class="w-full p-2 border rounded-lg text-sm bg-white font-medium"><option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option><option value="Cheque / DD">Cheque / DD</option><option value="Bank Transfer">Bank Transfer</option></select></div>
-                </div>
-                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Purpose / Booking Details</label><input type="text" id="advPurpose" required class="w-full p-2 border rounded-lg text-sm" value="Room Advance"></div>
-                <div class="flex justify-end gap-3 pt-4 border-t"><button type="button" onclick="closeAdvanceModal()" class="px-4 py-2 border rounded-lg text-sm text-slate-600">Cancel</button><button type="submit" id="advSubmitBtn" class="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium shadow">Add Advance Receipt</button></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 text-center py-4 text-xs no-print">
-        &copy; 2026 Hotel RAKS Management System. All rights reserved.
-    </footer>
-
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-32 transition duration-300 z-50">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
-        <span id="toastMessage" class="text-sm font-medium">Data saved successfully!</span>
     </div>
 
     <script>
-        const roomCategories = {
-            'Premium': [102, 103, 106, 107, 108, 203, 204, 206, 207, 208, 209, 210, 211, 212, 213, 303, 304, 307, 308, 309, 403, 404, 407, 408, 409],
-            'Family': [101, 109, 201, 214, 302, 305, 306, 402, 405, 406],
-            'Superior': [310, 311, 312, 313, 410, 411, 412, 413],
-            'Suite': [215, 216, 217]
-        };
-
-        const masterTariffPlans = {
-            'Premium': [
-                { name: 'CP Plan (Breakfast) - Single Occupancy', price: 2500 },
-                { name: 'CP Plan (Breakfast) - Double Occupancy', price: 3200 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Single Occupancy', price: 3100 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Double Occupancy', price: 4400 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Single Occupancy', price: 3700 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Double Occupancy', price: 5600 }
-            ],
-            'Family': [
-                { name: 'CP Plan (Breakfast) - Single Occupancy', price: 3000 },
-                { name: 'CP Plan (Breakfast) - Double Occupancy', price: 3800 },
-                { name: 'CP Plan (Breakfast) - Triple Occupancy', price: 4500 },
-                { name: 'CP Plan (Breakfast) - Four Occupancy', price: 5200 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Single Occupancy', price: 3600 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Double Occupancy', price: 5000 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Triple Occupancy', price: 6300 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Four Occupancy', price: 7600 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Single Occupancy', price: 4800 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Double Occupancy', price: 6200 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Triple Occupancy', price: 8100 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Four Occupancy', price: 10000 }
-            ],
-            'Superior': [
-                { name: 'CP Plan (Breakfast) - Single Occupancy', price: 4500 },
-                { name: 'CP Plan (Breakfast) - Double Occupancy', price: 5500 },
-                { name: 'CP Plan (Breakfast) - Triple Occupancy', price: 6100 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Single Occupancy', price: 5100 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Double Occupancy', price: 6700 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Triple Occupancy', price: 7900 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Single Occupancy', price: 5700 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Double Occupancy', price: 7900 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Triple Occupancy', price: 9700 }
-            ],
-            'Suite': [
-                { name: 'CP Plan (Breakfast) - Single Occupancy', price: 10000 },
-                { name: 'CP Plan (Breakfast) - Double Occupancy', price: 10000 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Single Occupancy', price: 10600 },
-                { name: 'MAP Plan (Breakfast & Lunch/Dinner) - Double Occupancy', price: 11200 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Single Occupancy', price: 11800 },
-                { name: 'AP Plan (Breakfast, Lunch & Dinner) - Double Occupancy', price: 12400 }
+        const denominations = [500, 200, 100, 50, 20, 10, 5];
+        let state = {
+            foc: { 500: 4, 200: 9, 100: 2, 50: 1, 20: 2, 10: 0, 5: 0 },
+            rest: { 500: 0, 200: 0, 100: 0, 50: 0, 20: 0, 10: 0, 5: 0 },
+            bar: { 500: 38, 200: 0, 100: 1, 50: 0, 20: 2, 10: 0, 5: 0 },
+            bqt: { 500: 0, 200: 0, 100: 0, 50: 0, 20: 0, 10: 0, 5: 0 },
+            receivedList: [{ name: 'ROOM 102 - BALANCE', amount: 0 }],
+            vouchers: [{ desc: 'DISHWASH', amount: 100 }],
+            advBookings: [
+                { rNo: '103', name: 'GOWTHAMAN/ABBOTS PVT LTD', persons: 1, amount: '-', date: '-', billNo: '-' },
+                { rNo: '215', name: 'KARTHIKEYAN', persons: 2, amount: '5000 /CASH', date: '06.11.2026', billNo: '9814' }
             ]
         };
 
-        function getRoomCategory(roomNo) {
-            let rNum = parseInt(roomNo);
-            for (let cat in roomCategories) {
-                if (roomCategories[cat].includes(rNum)) return cat;
-            }
-            return 'Premium';
-        }
-
-        let roomsMaster = {};
-        for (let i = 101; i <= 109; i++) roomsMaster[i] = { status: 'vacant', guest: '', guestData: null };
-        for (let i = 201; i <= 217; i++) roomsMaster[i] = { status: 'vacant', guest: '', guestData: null };
-        for (let i = 302; i <= 313; i++) roomsMaster[i] = { status: 'vacant', guest: '', guestData: null };
-        for (let i = 402; i <= 413; i++) roomsMaster[i] = { status: 'vacant', guest: '', guestData: null };
-
-        roomsMaster[408] = { status: 'occupied', guest: 'PARIVEL', guestData: { mobile: '9876543210', amount: 0, gr: '3', tariff: 2625 } };
-
+        let roomsMaster = { 408: { status: 'occupied', guest: 'PARIVEL' } };
         let rowsData = [];
         let advanceData = [];
-        let extraSummaryRows = { rooms: [], banquet: [], restaurant: [], bar: [] };
-        let summaryInputsData = {};
-        let uploadedTargetRooms = []; // Stores room numbers parsed/uploaded from image/list
 
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('headerDate').valueAsDate = new Date();
-            document.getElementById('advDate').valueAsDate = new Date();
-            document.getElementById('summaryDateInput').valueAsDate = new Date();
-            
-            const savedRooms = localStorage.getItem('hotel_raks_rooms_master_v24');
-            if (savedRooms) { try { roomsMaster = JSON.parse(savedRooms); } catch(e){console.error(e);} }
-
-            const savedData = localStorage.getItem('hotel_raks_fcr_categorized_data');
-            if (savedData) { try { rowsData = JSON.parse(savedData); } catch (e) { console.error(e); } }
-
-            const savedAdv = localStorage.getItem('hotel_raks_advance_receipts_data');
-            if (savedAdv) { try { advanceData = JSON.parse(savedAdv); } catch (e) { console.error(e); } }
-
-            const savedExtra = localStorage.getItem('hotel_raks_extra_summary_rows_v2');
-            if (savedExtra) { try { extraSummaryRows = JSON.parse(savedExtra); } catch (e) { console.error(e); } }
-
-            const savedSummary = localStorage.getItem('hotel_raks_summary_inputs_v2');
-            if (savedSummary) {
-                try {
-                    summaryInputsData = JSON.parse(savedSummary);
-                    for (const [id, val] of Object.entries(summaryInputsData)) {
-                        const el = document.getElementById(id);
-                        if (el && !id.startsWith('extra_')) el.value = val;
-                    }
-                } catch (e) { console.error(e); }
-            }
-
+        window.onload = function() {
+            renderDenominations('foc');
+            renderDenominations('rest');
+            renderDenominations('bar');
+            renderDenominations('bqt');
+            renderReceivedList();
+            renderVouchers();
+            renderAuditAdvanceBookings();
+            updateAllCalculations();
             renderRoomGrids();
-            renderRoomTypeTableView();
-            renderExtraRows();
-            renderTable();
-            renderAdvanceTable();
-            calculateFinalSummary();
-        });
+        };
 
-        // ================= ROOM LIST IMAGE UPLOAD HANDLER =================
-        function handleRoomListUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            document.getElementById('uploadedFileName').innerText = file.name;
-            
-            // Simulating parsing room numbers from image (For demo, extracting standard vacant rooms or active rooms list as shown in 1st image)
-            // Neenga upload panra image-la irukkira room numbers-ku eppadiyum match aagura mathiri demo-ku or sample room list (e.g. 102, 106, 107, 201, 212, 213, 302, 305, etc.) load panrom.
-            uploadedTargetRooms = ['102', '106', '107', '201', '212', '213', '214', '215', '216', '217', '302', '305', '402', '411'];
-            
-            renderRoomTypeTableView();
-            showToast(`Room list image uploaded successfully! ${uploadedTargetRooms.length} rooms highlighted.`, "success");
+        function switchProgram(prog) {
+            if (prog === 'audit') {
+                document.getElementById('appContainerAudit').classList.remove('hidden');
+                document.getElementById('appContainerFo').classList.add('hidden');
+                document.getElementById('btnAppAudit').className = "bg-amber-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold shadow flex items-center gap-2";
+                document.getElementById('btnAppFo').className = "bg-slate-800 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold border border-slate-700 flex items-center gap-2";
+            } else {
+                document.getElementById('appContainerAudit').classList.add('hidden');
+                document.getElementById('appContainerFo').classList.remove('hidden');
+                document.getElementById('btnAppFo').className = "bg-amber-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold shadow flex items-center gap-2";
+                document.getElementById('btnAppAudit').className = "bg-slate-800 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold border border-slate-700 flex items-center gap-2";
+            }
         }
 
-        function switchView(view) {
+        function switchFoView(v) {
             document.getElementById('viewCheckin').classList.add('hidden');
             document.getElementById('viewFcr').classList.add('hidden');
             document.getElementById('viewAdvance').classList.add('hidden');
-            document.getElementById('viewSummary').classList.add('hidden');
-
-            if (view === 'checkin') document.getElementById('viewCheckin').classList.remove('hidden');
-            if (view === 'fcr') document.getElementById('viewFcr').classList.remove('hidden');
-            if (view === 'advance') document.getElementById('viewAdvance').classList.remove('hidden');
-            if (view === 'summary') document.getElementById('viewSummary').classList.remove('hidden');
+            document.getElementById(v === 'checkin' ? 'viewCheckin' : v === 'fcr' ? 'viewFcr' : 'viewAdvance').classList.remove('hidden');
         }
 
-        function sidebarAction(action) {
-            if (action === 'Login') alert("F2 Login: Administrator Logged In.");
-            else if (action === 'Reservation') alert("F4 Reservation Module Active.");
-            else if (action === 'Occupancy') alert("F9 Occupancy Report generated successfully.");
-            else if (action === 'Alerts') alert("F11 Alerts: No pending alerts.");
-            else if (action === 'Address') alert("F12 Address Book loaded.");
+        function renderDenominations(sec) {
+            const tbody = document.getElementById(`denom-${sec}`);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            denominations.forEach(d => {
+                const count = state[sec][d] || 0;
+                tbody.innerHTML += `<tr><td class="py-1 text-rose-600">${d}</td><td class="text-center"><input type="number" value="${count}" class="w-12 text-center border rounded" oninput="state['${sec}'][${d}]=parseInt(this.value)||0;updateAllCalculations()"></td><td class="text-right">${count*d}</td></tr>`;
+            });
         }
 
-        function simulateAadharOCR(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            document.getElementById('regGuestName').value = "Guest Name";
-            document.getElementById('regGuestAge').value = "30";
-            document.getElementById('regStreet').value = "Main Street";
-            document.getElementById('regArea').value = "City Area";
-            document.getElementById('regCity').value = "Thanjavur";
-            showToast("ID Scanned successfully! Details auto-filled.", "success");
+        function calculateSectionTotal(sec) {
+            return denominations.reduce((acc, d) => acc + ((state[sec][d] || 0) * d), 0);
         }
 
-        function updateRoomStatusCounters() {
-            let total = 0, occupied = 0, vacant = 0, blocked = 0, notReady = 0;
-            for (let r in roomsMaster) {
-                total++;
-                let st = roomsMaster[r].status;
-                if (st === 'occupied') occupied++;
-                else if (st === 'vacant') vacant++;
-                else if (st === 'blocked') blocked++;
-                else if (st === 'not_ready') notReady++;
-            }
-            document.getElementById('counterTotal').innerText = total;
-            document.getElementById('counterOccupied').innerText = occupied;
-            document.getElementById('counterVacant').innerText = vacant;
-            document.getElementById('counterBlocked').innerText = blocked;
-            document.getElementById('counterNotReady').innerText = notReady;
+        function renderReceivedList() {
+            const c = document.getElementById('receivedListContainer');
+            c.innerHTML = '';
+            state.receivedList.forEach(i => { c.innerHTML += `<div class="flex justify-between text-xs bg-slate-50 p-1"><span>${i.name}</span><span>+${i.amount}</span></div>`; });
+        }
+
+        function renderVouchers() {
+            const c = document.getElementById('voucherListContainer');
+            c.innerHTML = '';
+            state.vouchers.forEach(v => { c.innerHTML += `<div class="flex justify-between text-xs bg-rose-50 p-1"><span>${v.desc}</span><span>-${v.amount}</span></div>`; });
+        }
+
+        function renderAuditAdvanceBookings() {
+            const tbody = document.getElementById('auditAdvanceTableBody');
+            tbody.innerHTML = '';
+            state.advBookings.forEach((b) => {
+                tbody.innerHTML += `<tr><td class="p-2">${b.rNo}</td><td class="p-2 font-bold">${b.name}</td><td class="p-2 text-center">${b.persons}</td><td class="p-2">${b.amount}</td><td class="p-2">${b.date}</td><td class="p-2">${b.billNo}</td><td></td></tr>`;
+            });
+        }
+
+        function updateAllCalculations() {
+            const foc = calculateSectionTotal('foc');
+            document.getElementById('total-foc').innerText = foc;
+            document.getElementById('summaryOpening').innerText = foc;
+            document.getElementById('metaOpeningDisplay').innerText = foc;
+
+            const rest = calculateSectionTotal('rest');
+            const bar = calculateSectionTotal('bar');
+            const bqt = calculateSectionTotal('bqt');
+
+            document.getElementById('total-rest').innerText = rest;
+            document.getElementById('total-bar').innerText = bar;
+            document.getElementById('total-bqt').innerText = bqt;
+
+            document.getElementById('sumRestTotal').innerText = rest;
+            document.getElementById('sumBarTotal').innerText = bar;
+            document.getElementById('sumBqtTotal').innerText = bqt;
+
+            const rec = state.receivedList.reduce((a,b)=>a+b.amount,0);
+            const vou = state.vouchers.reduce((a,b)=>a+b.amount,0);
+            document.getElementById('finalCalculatedClosing').innerText = foc + rec + rest + bar + bqt - vou;
         }
 
         function renderRoomGrids() {
-            renderFloorGrid('101', '109', 'floor1Grid');
-            renderFloorGrid('201', '217', 'floor2Grid');
-            renderFloorGrid('302', '313', 'floor3Grid');
-            renderFloorGrid('402', '413', 'floor4Grid');
-            updateRoomStatusCounters();
-        }
-
-        function renderFloorGrid(start, end, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            for (let r in roomsMaster) {
-                let rNum = parseInt(r);
-                if (rNum >= parseInt(start) && rNum <= parseInt(end)) {
-                    let data = roomsMaster[r];
-                    let category = getRoomCategory(rNum);
-                    let bgColor = "bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100";
-                    let badge = "Vacant";
-
-                    if (data.status === 'occupied') {
-                        bgColor = "bg-rose-50 border-rose-300 text-rose-900 hover:bg-rose-100";
-                        badge = "Occupied";
-                    } else if (data.status === 'blocked') {
-                        bgColor = "bg-slate-200 border-slate-400 text-slate-800";
-                        badge = "Blocked";
-                    } else if (data.status === 'not_ready') {
-                        bgColor = "bg-purple-100 border-purple-300 text-purple-900";
-                        badge = "Not Ready";
-                    }
-
-                    const card = document.createElement('div');
-                    card.className = `p-2.5 rounded-xl border-2 ${bgColor} cursor-pointer transition shadow-sm flex flex-col justify-between`;
-                    card.onclick = () => { openStatusOrCheckin(r); };
-                    card.innerHTML = `
-                        <div class="flex justify-between items-center font-black text-sm">
-                            <span>#${r}</span>
-                            <span class="text-[9px] uppercase px-1.5 py-0.5 rounded bg-white/90 text-slate-900 font-bold">${badge}</span>
-                        </div>
-                        <div class="text-[10px] text-purple-900 font-bold mt-1">${category}</div>
-                        <div class="text-xs truncate mt-1 font-medium">${data.guest || (data.status === 'not_ready' ? 'Cleaning' : (data.status === 'blocked' ? 'Blocked' : 'Available'))}</div>
-                    `;
-                    container.appendChild(card);
-                }
+            const c = document.getElementById('floor1Grid');
+            if(!c) return;
+            c.innerHTML = '';
+            for(let i=402; i<=413; i++) {
+                c.innerHTML += `<div class="p-2 border rounded bg-emerald-50 text-xs text-center font-bold">#${i}<br>Vacant</div>`;
             }
         }
-
-        function openRoomTypeListModal() {
-            renderRoomTypeTableView();
-            document.getElementById('roomTypeListModal').classList.remove('hidden');
-        }
-
-        function closeRoomTypeListModal() {
-            document.getElementById('roomTypeListModal').classList.add('hidden');
-        }
-
-        function renderRoomTypeTableView() {
-            const tbody = document.getElementById('roomTypeTableBody');
-            tbody.innerHTML = '';
-            const pList = roomCategories['Premium'];
-            const fList = roomCategories['Family'];
-            const sList = roomCategories['Superior'];
-            const suList = roomCategories['Suite'];
-
-            updateCategoryHeaderStats('Premium', pList);
-            updateCategoryHeaderStats('Family', fList);
-            updateCategoryHeaderStats('Superior', sList);
-            updateCategoryHeaderStats('Suite', suList);
-
-            const maxRows = Math.max(pList.length, fList.length, sList.length, suList.length);
-            for (let i = 0; i < maxRows; i++) {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 text-center";
-                tr.innerHTML = `
-                    <td class="border border-slate-300 p-1">${renderCellContent(pList[i])}</td>
-                    <td class="border border-slate-300 p-1">${renderCellContent(fList[i])}</td>
-                    <td class="border border-slate-300 p-1">${renderCellContent(sList[i])}</td>
-                    <td class="border border-slate-300 p-1">${renderCellContent(suList[i])}</td>
-                `;
-                tbody.appendChild(tr);
-            }
-        }
-
-        function updateCategoryHeaderStats(catName, roomList) {
-            let total = roomList.length, occupied = 0, vacant = 0;
-            roomList.forEach(rNum => {
-                let st = roomsMaster[rNum.toString()]?.status || 'vacant';
-                if (st === 'occupied') occupied++; else vacant++;
-            });
-            const headerEl = document.getElementById('headerTitle' + catName);
-            if (headerEl) {
-                headerEl.innerHTML = `${catName.toUpperCase()} <span class="text-[9px] text-amber-300 font-semibold">(Tot: ${total} | Occ: ${occupied} | Vac: ${vacant})</span>`;
-            }
-        }
-
-        function renderCellContent(rNum) {
-            if (!rNum) return '';
-            let r = rNum.toString();
-            let data = roomsMaster[r] || { status: 'vacant', guest: '' };
-            
-            // Check if this room is in the uploaded list to show different color
-            let isUploadedMatch = uploadedTargetRooms.includes(r);
-            
-            let bgClass = "bg-emerald-50 text-emerald-900 border-emerald-300 hover:bg-emerald-100";
-            let statusText = "Vacant";
-
-            if (isUploadedMatch) {
-                // Different special color for uploaded list rooms (e.g. vibrant forest green/yellow gradient similar to 1st image)
-                bgClass = "bg-emerald-700 text-white border-emerald-900 font-black shadow-md";
-                statusText = "List Active";
-            } else if (data.status === 'occupied') {
-                bgClass = "bg-rose-100 text-rose-900 border-rose-300 font-bold";
-                statusText = data.guest ? data.guest : "Occupied";
-            } else if (data.status === 'blocked') {
-                bgClass = "bg-blue-100 text-blue-900 border-blue-300";
-                statusText = "Blocked";
-            } else if (data.status === 'not_ready') {
-                bgClass = "bg-purple-100 text-purple-900 border-purple-300";
-                statusText = "Not Ready";
-            }
-
-            return `
-                <div onclick="closeRoomTypeListModal(); openStatusOrCheckin('${r}')" class="p-1.5 rounded border ${bgClass} cursor-pointer transition text-[11px] flex justify-between items-center shadow-xs">
-                    <span class="font-bold font-mono">#${r}</span>
-                    <span class="text-[10px] truncate max-w-[85px]">${statusText}</span>
-                </div>
-            `;
-        }
-
-        function openStatusOrCheckin(roomNo) {
-            const data = roomsMaster[roomNo];
-            if (data.status === 'not_ready' || data.status === 'blocked') {
-                openStatusModal(roomNo);
-            } else {
-                openCheckInModal(roomNo);
-            }
-        }
-
-        function openStatusModal(roomNo) {
-            document.getElementById('statusRoomNo').value = roomNo;
-            document.getElementById('statusModalTitle').innerText = `Room #${roomNo} Status Update`;
-            document.getElementById('statusModal').classList.remove('hidden');
-        }
-
-        function closeStatusModal() { document.getElementById('statusModal').classList.add('hidden'); }
-
-        function updateRoomStatus(newStatus) {
-            const roomNo = document.getElementById('statusRoomNo').value;
-            roomsMaster[roomNo].status = newStatus;
-            if (newStatus === 'vacant') {
-                roomsMaster[roomNo].guest = '';
-                roomsMaster[roomNo].guestData = null;
-            }
-            localStorage.setItem('hotel_raks_rooms_master_v24', JSON.stringify(roomsMaster));
-            renderRoomGrids();
-            renderRoomTypeTableView();
-            closeStatusModal();
-            showToast(`Room #${roomNo} status updated to ${newStatus.toUpperCase()}!`, "success");
-        }
-
-        function populateTariffPlansDropdown(category) {
-            const selectEl = document.getElementById('regTariffPlanSelect');
-            selectEl.innerHTML = '';
-            const plans = masterTariffPlans[category] || masterTariffPlans['Premium'];
-            plans.forEach((plan) => {
-                const opt = document.createElement('option');
-                opt.value = plan.price;
-                opt.text = `${plan.name} (₹${plan.price.toLocaleString('en-IN')})`;
-                selectEl.appendChild(opt);
-            });
-            if (plans.length > 0) {
-                document.getElementById('regTariffRateInput').value = plans[0].price;
-            }
-        }
-
-        function onTariffPlanChange() {
-            const selectEl = document.getElementById('regTariffPlanSelect');
-            if (selectEl.value) {
-                document.getElementById('regTariffRateInput').value = selectEl.value;
-                calculateBillDetails();
-            }
-        }
-
-        function openCheckInModal(roomNo) {
-            document.getElementById('checkinRoomNo').value = roomNo;
-            const category = getRoomCategory(parseInt(roomNo));
-            populateTariffPlansDropdown(category);
-
-            document.getElementById('modalRoomNoDisplay').innerHTML = `ROOM #${roomNo}`;
-            document.getElementById('modalCategoryBadge').innerText = `${category.toUpperCase()} ROOM`;
-            document.getElementById('headerGrDisplay').innerText = Math.floor(1 + Math.random()*10);
-            document.getElementById('headerDateDisplay').innerText = new Date().toLocaleDateString();
-            document.getElementById('regRoomType').value = category;
-
-            const now = new Date();
-            const tomorrow = new Date(now);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-
-            document.getElementById('checkinTime').value = now.toISOString().slice(0,16);
-            document.getElementById('checkoutTime').value = tomorrow.toISOString().slice(0,16);
-            document.getElementById('regDiscountPercent').value = "0";
-
-            const checkoutBtn = document.getElementById('checkoutBtn');
-            const submitBtn = document.getElementById('submitCheckinBtn');
-            const headerTitle = document.getElementById('modalHeaderTitle');
-            const roomInfo = roomsMaster[roomNo];
-
-            setFormEditable(roomInfo.status !== 'occupied');
-
-            if (roomInfo.status === 'occupied') {
-                headerTitle.innerText = "Room Occupied - Check-Out Option";
-                checkoutBtn.classList.remove('hidden');
-                submitBtn.innerText = "Update Check-In";
-                document.getElementById('regGuestName').value = roomInfo.guest || '';
-                document.getElementById('manualGr').value = roomInfo.guestData?.gr || '3';
-                document.getElementById('regPaymentAmount').value = roomInfo.guestData?.lastPayment || 0;
-            } else {
-                headerTitle.innerText = "Guest Check-In & Tariff Settlement";
-                checkoutBtn.classList.add('hidden');
-                submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save & Check-In`;
-                document.getElementById('regGuestName').value = '';
-                document.getElementById('regGuestAge').value = '';
-                document.getElementById('regPhone').value = '';
-            }
-
-            calculateBillDetails();
-            document.getElementById('checkinModal').classList.remove('hidden');
-        }
-
-        function setFormEditable(isEditable) {
-            const formInputs = document.querySelectorAll('#checkinModal input, #checkinModal select');
-            formInputs.forEach(inp => {
-                if (inp.id !== 'checkinRoomNo' && inp.id !== 'manualGr') {
-                    inp.disabled = !isEditable;
-                }
-            });
-        }
-
-        function enableEditMode() {
-            setFormEditable(true);
-            showToast("Edit mode enabled.", "info");
-        }
-
-        function calculateBillDetails() {
-            const rackRate = parseFloat(document.getElementById('regTariffRateInput').value) || 2500;
-            const discPercent = parseFloat(document.getElementById('regDiscountPercent').value) || 0;
-            const discountAmt = (rackRate * discPercent) / 100;
-            const discountedRate = rackRate - discountAmt;
-            const taxAmt = discountedRate * 0.05;
-            const nettRate = discountedRate + taxAmt;
-
-            document.getElementById('boxDiscountAmt').value = '₹' + discountAmt.toFixed(2);
-            document.getElementById('boxDiscDisplay').innerText = discPercent + '%';
-            document.getElementById('boxRackRate').innerText = '₹' + rackRate.toFixed(2);
-            document.getElementById('boxTaxAmt').innerText = '₹' + taxAmt.toFixed(2);
-            document.getElementById('boxNettRate').innerText = '₹' + nettRate.toFixed(2);
-        }
-
-        function closeCheckInModal() { document.getElementById('checkinModal').classList.add('hidden'); }
-
-        function handleCheckInPaymentSave() {
-            const roomNo = document.getElementById('checkinRoomNo').value;
-            const guestName = document.getElementById('regGuestName').value;
-            const manualGr = document.getElementById('manualGr').value;
-            const paymentAmt = parseFloat(document.getElementById('regPaymentAmount').value) || 0;
-            const paymentMode = document.getElementById('regPaymentBy').value;
-            
-            const rackRate = parseFloat(document.getElementById('regTariffRateInput').value) || 2500;
-            const discPercent = parseFloat(document.getElementById('regDiscountPercent').value) || 0;
-            const discountedRate = rackRate - ((rackRate * discPercent) / 100);
-            const nettRate = discountedRate + (discountedRate * 0.05);
-
-            if (!guestName) { alert("Please enter Guest Name."); return; }
-            if (paymentAmt <= 0) { alert("Please enter payment amount."); return; }
-
-            const billNo = "BL-" + Math.floor(1000 + Math.random()*9000);
-            const crNo = "CR-" + manualGr;
-
-            rowsData.push({
-                room: roomNo, cr: crNo, bill: billNo, details: "Already Advance Paid", name: guestName,
-                cash: paymentMode === 'Cash' ? paymentAmt : 0,
-                digital: (paymentMode === 'Card' || paymentMode === 'UPI') ? paymentAmt : 0,
-                credit: paymentMode === 'Credit' ? paymentAmt : 0,
-                mode: paymentMode
-            });
-
-            roomsMaster[roomNo] = {
-                status: 'occupied', guest: guestName,
-                guestData: { gr: manualGr, tariff: nettRate, discount: discPercent, lastPayment: paymentAmt }
-            };
-
-            localStorage.setItem('hotel_raks_rooms_master_v24', JSON.stringify(roomsMaster));
-            localStorage.setItem('hotel_raks_fcr_categorized_data', JSON.stringify(rowsData));
-
-            renderRoomGrids();
-            renderTable();
-            calculateFinalSummary();
-            showToast(`Payment of ₹${paymentAmt} saved successfully!`, "success");
-        }
-
-        function handleCheckInSubmit(event) {
-            event.preventDefault();
-            const roomNo = document.getElementById('checkinRoomNo').value;
-            const guestName = document.getElementById('regGuestName').value;
-            const manualGr = document.getElementById('manualGr').value;
-            
-            const rackRate = parseFloat(document.getElementById('regTariffRateInput').value) || 2500;
-            const discPercent = parseFloat(document.getElementById('regDiscountPercent').value) || 0;
-            const discountedRate = rackRate - ((rackRate * discPercent) / 100);
-            const nettRate = discountedRate + (discountedRate * 0.05);
-
-            roomsMaster[roomNo] = {
-                status: 'occupied', guest: guestName,
-                guestData: { gr: manualGr, tariff: nettRate, discount: discPercent }
-            };
-
-            localStorage.setItem('hotel_raks_rooms_master_v24', JSON.stringify(roomsMaster));
-            renderRoomGrids();
-            closeCheckInModal();
-            showToast(`Room #${roomNo} checked-in!`, "success");
-        }
-
-        function handleCheckOut() {
-            const roomNo = document.getElementById('checkinRoomNo').value;
-            const roomInfo = roomsMaster[roomNo];
-            if (!roomInfo) return;
-
-            let roomFcrPayments = rowsData.filter(row => row.room === roomNo);
-            let totalPaid = roomFcrPayments.reduce((sum, row) => sum + (parseFloat(row.cash) || 0) + (parseFloat(row.digital) || 0) + (parseFloat(row.credit) || 0), 0);
-            let totalBill = parseFloat(roomInfo.guestData?.tariff) || 2625;
-            let balanceDue = totalBill - totalPaid;
-
-            document.getElementById('checkoutRoomNo').value = roomNo;
-            document.getElementById('coGuestName').innerText = roomInfo.guest || 'Guest';
-            document.getElementById('coTotalBill').innerText = '₹' + totalBill.toFixed(2);
-            document.getElementById('coPaidAmt').innerText = '₹' + totalPaid.toFixed(2);
-            document.getElementById('coBalanceDue').innerText = '₹' + (balanceDue > 0 ? balanceDue.toFixed(2) : '0.00');
-            document.getElementById('coPayAmount').value = balanceDue > 0 ? balanceDue.toFixed(2) : '0.00';
-
-            closeCheckInModal();
-            document.getElementById('checkoutModal').classList.remove('hidden');
-        }
-
-        function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
-
-        function confirmFullCheckoutAndPrint() {
-            const roomNo = document.getElementById('checkoutRoomNo').value;
-            const payAmt = parseFloat(document.getElementById('coPayAmount').value) || 0;
-            const payMode = document.getElementById('coPaymentMode').value;
-            const roomInfo = roomsMaster[roomNo];
-
-            if (payAmt > 0) {
-                const billNo = "BL-" + Math.floor(1000 + Math.random()*9000);
-                const crNo = "CR-" + (roomInfo.guestData?.gr || '3');
-                rowsData.push({
-                    room: roomNo, cr: crNo, bill: billNo, details: "Settlement", name: roomInfo.guest,
-                    cash: payMode === 'Cash' ? payAmt : 0,
-                    digital: (payMode === 'Card' || payMode === 'UPI') ? payAmt : 0,
-                    credit: payMode === 'Credit' ? payAmt : 0,
-                    mode: payMode
-                });
-                localStorage.setItem('hotel_raks_fcr_categorized_data', JSON.stringify(rowsData));
-            }
-
-            roomsMaster[roomNo] = { status: 'not_ready', guest: '', guestData: null };
-            localStorage.setItem('hotel_raks_rooms_master_v24', JSON.stringify(roomsMaster));
-
-            closeCheckoutModal();
-            renderRoomGrids();
-            renderTable();
-            calculateFinalSummary();
-            showToast("Check-Out completed! Room marked as Not Ready.", "success");
-        }
-
-        function finishCheckoutProcess() {
-            document.getElementById('printBillModal').classList.add('hidden');
-        }
-
-        function searchByGrNumber(grVal) {
-            grVal = grVal.trim();
-            if (!grVal) return;
-            for (let r in roomsMaster) {
-                if (roomsMaster[r].status === 'occupied' && roomsMaster[r].guestData?.gr === grVal) {
-                    document.getElementById('advGuestName').value = roomsMaster[r].guest;
-                    document.getElementById('advAmount').value = roomsMaster[r].guestData.tariff || 2500;
-                    document.getElementById('advPurpose').value = `Room Advance for #${r}`;
-                    showToast(`Found Guest: ${roomsMaster[r].guest}`, "success");
-                    break;
-                }
-            }
-        }
-
-        function handleSummaryEnter(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const inputs = Array.from(document.querySelectorAll('#viewSummary input[type="number"], #viewSummary input[type="text"]'));
-                const idx = inputs.indexOf(event.target);
-                if (idx > -1 && idx < inputs.length - 1) inputs[idx + 1].focus();
-            }
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('fcrTableBody');
-            tbody.innerHTML = '';
-            let totalCash = 0, totalDigital = 0, totalCredit = 0;
-
-            if (rowsData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center p-4 text-slate-400">No FCR entries added yet.</td></tr>`;
-            }
-
-            rowsData.forEach((row, index) => {
-                totalCash += parseFloat(row.cash) || 0;
-                totalDigital += parseFloat(row.digital) || 0;
-                totalCredit += parseFloat(row.credit) || 0;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition border-b border-slate-200";
-                tr.innerHTML = `
-                    <td class="border border-slate-300 p-2 text-center text-xs text-slate-500">${index + 1}</td>
-                    <td class="border border-slate-300 p-1"><input type="text" value="${row.room}" onchange="updateData(${index}, 'room', this.value)" class="w-full p-1 bg-transparent text-center"></td>
-                    <td class="border border-slate-300 p-1"><input type="text" value="${row.cr}" onchange="updateData(${index}, 'cr', this.value)" class="w-full p-1 bg-transparent text-center"></td>
-                    <td class="border border-slate-300 p-1"><input type="text" value="${row.bill}" onchange="updateData(${index}, 'bill', this.value)" class="w-full p-1 bg-transparent text-center"></td>
-                    <td class="border border-slate-300 p-1"><input type="text" value="${row.details}" onchange="updateData(${index}, 'details', this.value)" class="w-full p-1 bg-transparent"></td>
-                    <td class="border border-slate-300 p-1"><input type="text" value="${row.name}" onchange="updateData(${index}, 'name', this.value)" class="w-full p-1 bg-transparent"></td>
-                    <td class="border border-slate-300 p-1 bg-emerald-50/40"><input type="number" step="0.01" value="${row.cash}" onchange="updateAmount(${index}, 'cash', this.value)" class="w-full p-1 bg-transparent text-right font-mono text-emerald-800 font-bold"></td>
-                    <td class="border border-slate-300 p-1 bg-blue-50/40"><input type="number" step="0.01" value="${row.digital}" onchange="updateAmount(${index}, 'digital', this.value)" class="w-full p-1 bg-transparent text-right font-mono text-blue-800 font-bold"></td>
-                    <td class="border border-slate-300 p-1 bg-amber-50/40"><input type="number" step="0.01" value="${row.credit}" onchange="updateAmount(${index}, 'credit', this.value)" class="w-full p-1 bg-transparent text-right font-mono text-amber-800 font-bold"></td>
-                    <td class="border border-slate-300 p-1"><input type="text" value="${row.mode}" onchange="updateData(${index}, 'mode', this.value)" class="w-full p-1 bg-transparent"></td>
-                    <td class="border border-slate-300 p-1 text-center no-print"><button onclick="deleteRow(${index})" class="text-rose-500 p-1"><i class="fa-solid fa-trash"></i></button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            document.getElementById('totalCash').innerText = '₹' + totalCash.toFixed(2);
-            document.getElementById('totalDigital').innerText = '₹' + totalDigital.toFixed(2);
-            document.getElementById('totalCredit').innerText = '₹' + totalCredit.toFixed(2);
-            document.getElementById('grandTotalLabel').innerText = 'Total Revenue: ₹' + (totalCash + totalDigital + totalCredit).toFixed(2);
-        }
-
-        function renderAdvanceTable() {
-            const tbody = document.getElementById('advanceTableBody');
-            tbody.innerHTML = '';
-            let totalAdv = 0;
-            advanceData.forEach((adv, index) => {
-                totalAdv += parseFloat(adv.amount) || 0;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="border border-slate-300 p-2 text-center">${index + 1}</td>
-                    <td class="border border-slate-300 p-2 text-center font-bold">${adv.receiptNo}</td>
-                    <td class="border border-slate-300 p-2 text-center">${adv.date}</td>
-                    <td class="border border-slate-300 p-2 text-center">${adv.grNo || '-'}</td>
-                    <td class="border border-slate-300 p-2">${adv.name}</td>
-                    <td class="border border-slate-300 p-2 text-right font-mono">₹${Number(adv.amount).toFixed(2)}</td>
-                    <td class="border border-slate-300 p-2 text-center">${adv.mode}</td>
-                    <td class="border border-slate-300 p-2">${adv.purpose}</td>
-                    <td class="border border-slate-300 p-2 text-center no-print"><button onclick="deleteAdvance(${index})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-            document.getElementById('totalAdvanceAmount').innerText = '₹' + totalAdv.toFixed(2);
-        }
-
-        function addExtraRow(sec) {
-            extraSummaryRows[sec].push({ desc: 'CUSTOM ENTRY', amount: '' });
-            renderExtraRows();
-            calculateFinalSummary();
-        }
-
-        function removeExtraRow(sec, idx) {
-            extraSummaryRows[sec].splice(idx, 1);
-            renderExtraRows();
-            calculateFinalSummary();
-        }
-
-        function renderExtraRows() {
-            ['rooms', 'banquet', 'restaurant', 'bar'].forEach(sec => {
-                const container = document.getElementById(sec + 'ExtraRows');
-                if (!container) return;
-                container.innerHTML = '';
-                extraSummaryRows[sec].forEach((item, idx) => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="border border-slate-300 px-2 py-1 flex items-center gap-2">
-                            <input type="text" value="${item.desc}" oninput="updateExtraDesc('${sec}', ${idx}, this.value)" class="w-full bg-transparent font-medium uppercase focus:outline-none">
-                            <button onclick="removeExtraRow('${sec}', ${idx})" class="no-print text-rose-500"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                        <td class="border border-slate-300 px-1 py-1 w-36">
-                            <input type="number" value="${item.amount}" oninput="updateExtraAmount('${sec}', ${idx}, this.value)" class="w-full text-right bg-transparent font-mono focus:outline-none">
-                        </td>
-                    `;
-                    container.appendChild(tr);
-                });
-            });
-        }
-
-        function updateExtraDesc(sec, idx, val) { extraSummaryRows[sec][idx].desc = val; }
-        function updateExtraAmount(sec, idx, val) { extraSummaryRows[sec][idx].amount = val; calculateFinalSummary(); }
-
-        function calculateFinalSummary() {
-            let rCash = 0, rCard = 0, rUpi = 0, rCredit = 0;
-            let advCard = 0, advUpi = 0, advCash = 0;
-
-            rowsData.forEach(row => {
-                const c = parseFloat(row.cash) || 0;
-                const d = parseFloat(row.digital) || 0;
-                const cr = parseFloat(row.credit) || 0;
-                if (c > 0) rCash += c;
-                if (d > 0) rCard += d;
-                if (cr > 0) rCredit += cr;
-            });
-
-            document.getElementById('sum_room_cash').innerText = rCash.toFixed(2);
-            document.getElementById('sum_room_card').innerText = rCard.toFixed(2);
-            document.getElementById('sum_room_upi').innerText = rUpi.toFixed(2);
-            document.getElementById('sum_room_credit').innerText = rCredit.toFixed(2);
-
-            let extraRooms = 0; extraSummaryRows.rooms.forEach(i => extraRooms += parseFloat(i.amount) || 0);
-            const roomsTotal = rCash + rCard + rUpi + rCredit + extraRooms;
-            document.getElementById('sum_rooms_total').innerText = roomsTotal.toFixed(2);
-
-            let extraBq = 0; extraSummaryRows.banquet.forEach(i => extraBq += parseFloat(i.amount) || 0);
-            document.getElementById('sum_banquet_total').innerText = extraBq.toFixed(2);
-
-            let extraRest = 0; extraSummaryRows.restaurant.forEach(i => extraRest += parseFloat(i.amount) || 0);
-            document.getElementById('sum_restaurant_total').innerText = extraRest.toFixed(2);
-
-            let extraBar = 0; extraSummaryRows.bar.forEach(i => extraBar += parseFloat(i.amount) || 0);
-            document.getElementById('sum_bar_total').innerText = extraBar.toFixed(2);
-
-            const grandTotal = roomsTotal + extraBq + extraRest + extraBar;
-            document.getElementById('sum_grand_total').innerText = '₹' + grandTotal.toFixed(2);
-        }
-
-        function updateData(index, field, value) { rowsData[index][field] = value; calculateFinalSummary(); }
-        function updateAmount(index, field, value) { rowsData[index][field] = parseFloat(value) || 0; renderTable(); calculateFinalSummary(); }
 
         function openAddModal() { document.getElementById('addModal').classList.remove('hidden'); }
         function closeAddModal() { document.getElementById('addModal').classList.add('hidden'); }
-
-        function handleModalSubmit(event) {
-            event.preventDefault();
-            const room = document.getElementById('modalRoom').value;
-            const cr = document.getElementById('modalCr').value;
-            const bill = document.getElementById('modalBill').value;
-            const details = document.getElementById('modalDetails').value;
-            const name = document.getElementById('modalName').value;
-            const mode = document.getElementById('modalMode').value;
-            const amount = parseFloat(document.getElementById('modalAmount').value) || 0;
-
-            let cash = (mode === 'Cash') ? amount : 0;
-            let credit = (mode === 'Credit') ? amount : 0;
-            let digital = (mode !== 'Cash' && mode !== 'Credit') ? amount : 0;
-
-            rowsData.push({ room, cr, bill, details, name, cash, digital, credit, mode });
+        function handleModalSubmit(e) {
+            e.preventDefault();
+            rowsData.push({ room: document.getElementById('modalRoom').value, name: document.getElementById('modalName').value, cash: document.getElementById('modalAmount').value });
             renderTable();
-            calculateFinalSummary();
             closeAddModal();
-            showToast("Entry added!", "success");
         }
-
+        function renderTable() {
+            const tb = document.getElementById('fcrTableBody');
+            tb.innerHTML = '';
+            rowsData.forEach(r => { tb.innerHTML += `<tr><td class="border p-2">${r.room}</td><td class="border p-2">${r.name}</td><td class="border p-2 text-right">₹${r.cash}</td></tr>`; });
+        }
         function openAdvanceModal() { document.getElementById('advanceModal').classList.remove('hidden'); }
         function closeAdvanceModal() { document.getElementById('advanceModal').classList.add('hidden'); }
-
-        function handleAdvanceSubmit(event) {
-            event.preventDefault();
-            advanceData.push({
-                receiptNo: document.getElementById('advReceiptNo').value,
-                date: document.getElementById('advDate').value,
-                grNo: document.getElementById('advGrInput').value,
-                name: document.getElementById('advGuestName').value,
-                amount: document.getElementById('advAmount').value,
-                mode: document.getElementById('advPaymentMode').value,
-                purpose: document.getElementById('advPurpose').value
-            });
-            renderAdvanceTable();
-            closeAdvanceModal();
-            showToast("Advance added!", "success");
-        }
-
-        function deleteRow(idx) { rowsData.splice(idx, 1); renderTable(); calculateFinalSummary(); }
-        function deleteAdvance(idx) { advanceData.splice(idx, 1); renderAdvanceTable(); }
-
-        function resetSummary() {
-            if (confirm("Reset summary?")) {
-                extraSummaryRows = { rooms: [], banquet: [], restaurant: [], bar: [] };
-                renderExtraRows();
-                calculateFinalSummary();
-            }
-        }
-
-        function saveReport() {
-            localStorage.setItem('hotel_raks_rooms_master_v24', JSON.stringify(roomsMaster));
-            localStorage.setItem('hotel_raks_fcr_categorized_data', JSON.stringify(rowsData));
-            showToast("Saved successfully!", "success");
-        }
-
-        function showToast(message, type) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').innerText = message;
-            toast.classList.remove('translate-y-32');
-            setTimeout(() => { toast.classList.add('translate-y-32'); }, 2500);
-        }
     </script>
 </body>
 </html>
